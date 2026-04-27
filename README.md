@@ -6,7 +6,7 @@
 
 为开发者、研究员、写作者打造的 AI Agent 工作站 —— 多 App 切换、对话历史、知识库、长期记忆，一套壳容下所有专业 agent。
 
-[**🚀 在线体验**](https://forge-ui.github.io/forge-agent/) · [Forge UI Kit](https://forge-ui.github.io/forge) · [forge-starter](https://github.com/forge-ui/forge-starter)
+[**🚀 在线体验**](https://agent.forgeui.org/) · [Forge UI Kit](https://forge-ui.github.io/forge) · [forge-starter](https://github.com/forge-ui/forge-starter)
 
 </div>
 
@@ -70,7 +70,7 @@
 
 ## 截图
 
-> 在线体验更直观：https://forge-ui.github.io/forge-agent/
+> 在线体验更直观：https://agent.forgeui.org/
 
 ```
 左：Sidebar         中：Chat 工作区          右（点击触发）：思考 / 工具 / 来源 抽屉

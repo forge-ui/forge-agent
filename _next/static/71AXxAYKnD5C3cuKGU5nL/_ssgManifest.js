@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002F[appId]\u002Fchat","\u002F[appId]\u002Fknowledge","\u002F[appId]\u002Fsettings"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

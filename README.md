@@ -68,30 +68,6 @@
 
 ---
 
-## 截图
-
-> 在线体验更直观：https://agent.forgeui.org/
-
-```
-左：Sidebar         中：Chat 工作区          右（点击触发）：思考 / 工具 / 来源 抽屉
-─────────────────  ─────────────────────  ─────────────────────────────────────
-Forge logo         你好，Alex 👋             思考过程
-Code Studio ▾      我是 Code Studio...       共思考 1.2s · 3 步
-                                              1. 拆解任务 ...
-+ 新对话             [大输入框]                 2. 确认数据源 ...
-                   深度思考 / 联网搜索…        3. 决定输出结构 ...
-今天
- · 改下登录页样式
- · PR #234 review
-昨天
- · 重构 user-...
-
-知识库 / 设置
-Alex Morgan ▾
-```
-
----
-
 ## 本地跑
 
 ```bash
@@ -112,17 +88,6 @@ pnpm dev
 ```
 
 > 装不下 `@forge-ui/react`？是 GitHub Packages 鉴权问题，确认 PAT 有 `read:packages` 权限。
-
----
-
-## 部署到 GitHub Pages
-
-```bash
-GITHUB_PAGES=true pnpm build   # 产物在 out/
-# 把 out 推到 gh-pages 分支即可
-```
-
-`next.config.ts` 里 `GITHUB_PAGES=true` 时会自动开启 `output: "export"` + `basePath: "/forge-agent"`。
 
 ---
 
@@ -153,16 +118,6 @@ GITHUB_PAGES=true pnpm build   # 产物在 out/
 
 ---
 
-## 致谢
-
-灵感来自调研过的开源项目：
-
-- [lobe-chat](https://github.com/lobehub/lobe-chat) · [open-webui](https://github.com/open-webui/open-webui) · [LibreChat](https://github.com/danny-avila/LibreChat)
-- [Dify](https://github.com/langgenius/dify) · [FastGPT](https://github.com/labring/FastGPT) · [JoyAgent-JDGenie](https://github.com/jd-opensource/joyagent-jdgenie)
-- 视觉参考 Kimi · DeepSeek · 元宝 · 智谱清言 · ChatGPT · Claude · Grok
-
----
-
 ## License
 
-UNLICENSED · 内部使用。Forge UI Kit 的 license 见 [forge-core](https://github.com/forge-ui/forge-core)。
+MIT

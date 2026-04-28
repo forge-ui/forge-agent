@@ -13,6 +13,7 @@
     "next": "^16.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "recharts": "^3.8.1",
     "solar-icon-set": "^2.0.0"
   },
   "devDependencies": {

@@ -10,6 +10,8 @@
 
 </div>
 
+![Forge Agent screenshot](public/images/screenshot.png)
+
 ---
 
 ## 它是什么

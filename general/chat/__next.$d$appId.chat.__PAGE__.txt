@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[73846,["/_next/static/chunks/0--gly6c6~6o9.js","/_next/static/chunks/0aw1r5ek80nyo.js","/_next/static/chunks/06m5_ipp0.fd-.js","/_next/static/chunks/12f--7n591rhe.js","/_next/static/chunks/0ji850f3e94a8.js","/_next/static/chunks/16sk1holg332n.js"],"AppShell"]
+3:"$Sreact.suspense"
+4:I[72575,["/_next/static/chunks/0--gly6c6~6o9.js","/_next/static/chunks/0aw1r5ek80nyo.js","/_next/static/chunks/06m5_ipp0.fd-.js","/_next/static/chunks/12f--7n591rhe.js","/_next/static/chunks/0ji850f3e94a8.js","/_next/static/chunks/16sk1holg332n.js"],"ChatRouter"]
+5:I[62711,["/_next/static/chunks/0--gly6c6~6o9.js","/_next/static/chunks/0aw1r5ek80nyo.js"],"OutletBoundary"]
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"hideHeader":true,"children":["$","$3",null,{"fallback":null,"children":["$","$L4",null,{"appId":"general"}]}]}],[["$","script","script-0",{"src":"/_next/static/chunks/06m5_ipp0.fd-.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/12f--7n591rhe.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/0ji850f3e94a8.js","async":true}],["$","script","script-3",{"src":"/_next/static/chunks/16sk1holg332n.js","async":true}]],["$","$L5",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@6"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"GLr6zwjLtcNw_sIR2cGtU"}
+6:null

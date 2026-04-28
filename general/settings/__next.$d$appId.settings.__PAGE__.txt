@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[73846,["/_next/static/chunks/0--gly6c6~6o9.js","/_next/static/chunks/0aw1r5ek80nyo.js","/_next/static/chunks/134c6w.slgqlm.js","/_next/static/chunks/0ji850f3e94a8.js","/_next/static/chunks/12f--7n591rhe.js"],"AppShell"]
+3:I[47855,["/_next/static/chunks/0--gly6c6~6o9.js","/_next/static/chunks/0aw1r5ek80nyo.js","/_next/static/chunks/134c6w.slgqlm.js","/_next/static/chunks/0ji850f3e94a8.js","/_next/static/chunks/12f--7n591rhe.js"],"PagePlaceholder"]
+4:I[62711,["/_next/static/chunks/0--gly6c6~6o9.js","/_next/static/chunks/0aw1r5ek80nyo.js"],"OutletBoundary"]
+5:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"pageTitle":"设置","children":["$","$L3",null,{"pageLabel":"设置","description":"这里放当前 App 的配置和长期记忆。"}]}],[["$","script","script-0",{"src":"/_next/static/chunks/134c6w.slgqlm.js","async":true}],["$","script","script-1",{"src":"/_next/static/chunks/0ji850f3e94a8.js","async":true}],["$","script","script-2",{"src":"/_next/static/chunks/12f--7n591rhe.js","async":true}]],["$","$L4",null,{"children":["$","$5",null,{"name":"Next.MetadataOutlet","children":"$@6"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"GLr6zwjLtcNw_sIR2cGtU"}
+6:null

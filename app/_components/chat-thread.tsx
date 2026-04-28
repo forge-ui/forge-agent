@@ -241,29 +241,35 @@ export function ChatThread() {
 
   return (
     <div className="relative flex h-[calc(100vh-4rem)] flex-col overflow-hidden">
-      <main className="mx-auto flex w-full max-w-[820px] flex-1 flex-col gap-8 overflow-y-auto px-4 py-8">
-        {MOCK_MESSAGES.map((m) =>
-          m.role === "user" ? (
-            <UserMessage key={m.id} message={m} />
-          ) : (
-            <AssistantMessage
-              key={m.id}
-              message={m}
-              onOpenSources={() => setDrawer({ kind: "sources", messageId: m.id })}
-              onOpenThinking={() => setDrawer({ kind: "thinking", messageId: m.id })}
-              onOpenTools={() => setDrawer({ kind: "tools", messageId: m.id })}
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        <main className="flex-1 px-4 py-8">
+          <div className="mx-auto flex w-full max-w-[820px] flex-col gap-8">
+            {MOCK_MESSAGES.map((m) =>
+              m.role === "user" ? (
+                <UserMessage key={m.id} message={m} />
+              ) : (
+                <AssistantMessage
+                  key={m.id}
+                  message={m}
+                  onOpenSources={() => setDrawer({ kind: "sources", messageId: m.id })}
+                  onOpenThinking={() => setDrawer({ kind: "thinking", messageId: m.id })}
+                  onOpenTools={() => setDrawer({ kind: "tools", messageId: m.id })}
+                />
+              ),
+            )}
+          </div>
+        </main>
+        <div className="sticky bottom-0 bg-gradient-to-t from-fg-grey-50 via-fg-grey-50/95 to-transparent px-4 pb-2 pt-4">
+          <div className="mx-auto w-full max-w-[820px]">
+            <ChatPillBar
+              placeholder="继续问点什么..."
+              value={draft}
+              onChange={setDraft}
+              onSend={() => setDraft("")}
+              actions={pillActions}
             />
-          ),
-        )}
-      </main>
-      <div className="mx-auto w-full max-w-[820px] px-4 pb-2">
-        <ChatPillBar
-          placeholder="继续问点什么..."
-          value={draft}
-          onChange={setDraft}
-          onSend={() => setDraft("")}
-          actions={pillActions}
-        />
+          </div>
+        </div>
       </div>
 
       {drawer?.kind === "sources" && activeMessage?.role === "assistant" && activeMessage.sources && (

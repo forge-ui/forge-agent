@@ -2,24 +2,26 @@
 
 import { useState } from "react";
 import {
-  AltArrowDownLinear,
   AltArrowRightLinear,
-  CheckCircleBoldDuotone,
+  CheckSquareBoldDuotone,
   CodeSquareLinear,
-  CloseCircleLinear,
-  CopyLinear,
+  CloseSquareBoldDuotone,
+  CloseSquareLinear,
   DocumentTextLinear,
   LightbulbBoldDuotone,
   LinkLinear,
   MagniferLinear,
-  RefreshLinear,
   ShieldCheckBoldDuotone,
-  ArrowLeftDownLinear,
-  GalleryWideLinear,
-  MusicNotesLinear,
-  PlayCircleBoldDuotone,
+  PlayBoldDuotone,
 } from "solar-icon-set";
-import { ChatInputBar, type ChatInputBarToggle, FileTypeIcon } from "@forge-ui/react";
+import { FileTypeIcon } from "@forge-ui/react";
+import { ChatPillBar, type PillAction } from "./chat-pill-bar";
+import {
+  type ChatSource,
+  FollowUps,
+  MarkdownBody,
+  MessageActions,
+} from "./chat-shared";
 
 type ToolStep = {
   id: string;
@@ -27,14 +29,6 @@ type ToolStep = {
   args: string;
   result: string;
   status: "ok" | "warn" | "error";
-};
-
-type Source = {
-  id: string;
-  title: string;
-  hint: string;
-  favicon: string;
-  excerpt?: string;
 };
 
 type UserAttachment =
@@ -57,7 +51,7 @@ type Message =
       thinking?: { duration: string; steps: { title: string; body: string }[] };
       toolSteps?: ToolStep[];
       markdown: string;
-      sources?: Source[];
+      sources?: ChatSource[];
       followUps?: string[];
       time: string;
       latency?: string;
@@ -217,25 +211,26 @@ export function ChatThread() {
   const [mode, setMode] = useState<"think" | "search" | null>(null);
   const [drawer, setDrawer] = useState<Drawer>(null);
 
-  const toggles: ChatInputBarToggle[] = [
+  const pillActions: PillAction[] = [
     {
       id: "think",
       label: "深度思考",
-      icon: <LightbulbBoldDuotone size={15} color={mode === "think" ? "#fff" : "#52525B"} />,
+      icon: <LightbulbBoldDuotone size={16} color="currentColor" />,
       active: mode === "think",
       onClick: () => setMode(mode === "think" ? null : "think"),
     },
     {
       id: "search",
       label: "联网搜索",
-      icon: <MagniferLinear size={15} color={mode === "search" ? "#fff" : "#52525B"} />,
+      icon: <MagniferLinear size={16} color="currentColor" />,
       active: mode === "search",
       onClick: () => setMode(mode === "search" ? null : "search"),
     },
     {
       id: "upload",
       label: "上传文件",
-      icon: <DocumentTextLinear size={15} color="#52525B" />,
+      icon: <DocumentTextLinear size={16} color="currentColor" />,
+      closeOnClick: true,
       onClick: () => {},
     },
   ];
@@ -245,7 +240,7 @@ export function ChatThread() {
     : null;
 
   return (
-    <div className="relative flex h-full min-h-[calc(100vh-80px)] flex-col">
+    <div className="relative flex h-[calc(100vh-4rem)] flex-col overflow-hidden">
       <main className="mx-auto flex w-full max-w-[820px] flex-1 flex-col gap-8 overflow-y-auto px-4 py-8">
         {MOCK_MESSAGES.map((m) =>
           m.role === "user" ? (
@@ -261,16 +256,13 @@ export function ChatThread() {
           ),
         )}
       </main>
-      <div className="mx-auto flex w-full max-w-[820px] justify-center px-4 pb-6">
-        <ChatInputBar
-          className="w-full"
-          multiline
-          rows={3}
+      <div className="mx-auto w-full max-w-[820px] px-4 pb-2">
+        <ChatPillBar
           placeholder="继续问点什么..."
           value={draft}
           onChange={setDraft}
           onSend={() => setDraft("")}
-          toggles={toggles}
+          actions={pillActions}
         />
       </div>
 
@@ -321,7 +313,7 @@ function UserAttachmentBlock({ att }: { att: UserAttachment }) {
           aria-label="播放语音"
           className="flex size-7 items-center justify-center rounded-full bg-fg-violet text-white"
         >
-          <PlayCircleBoldDuotone size={16} color="#fff" />
+          <PlayBoldDuotone size={16} color="#fff" />
         </button>
         <div className="flex items-end gap-0.5">
           {[3, 5, 8, 6, 4, 7, 9, 5, 3, 6, 8, 4, 5, 7, 4, 3].map((h, i) => (
@@ -473,7 +465,7 @@ function ToolCallDrawer({
             aria-label="关闭"
             className="flex size-8 items-center justify-center rounded-full text-fg-grey-700 hover:bg-fg-grey-100"
           >
-            <CloseCircleLinear size={20} color="currentColor" />
+            <CloseSquareLinear size={20} color="currentColor" />
           </button>
         </header>
         <div className="flex-1 overflow-y-auto p-5">
@@ -482,11 +474,11 @@ function ToolCallDrawer({
               <li key={s.id} className="flex gap-3">
                 <div className="flex flex-col items-center pt-0.5">
                   {s.status === "ok" ? (
-                    <CheckCircleBoldDuotone size={18} color="#059669" />
+                    <CheckSquareBoldDuotone size={18} color="#059669" />
                   ) : s.status === "warn" ? (
                     <ShieldCheckBoldDuotone size={18} color="#D97706" />
                   ) : (
-                    <RefreshLinear size={18} color="#E11D48" />
+                    <CloseSquareBoldDuotone size={18} color="#E11D48" />
                   )}
                   {i < steps.length - 1 && (
                     <span className="mt-1 w-px flex-1 bg-fg-grey-200" />
@@ -510,108 +502,11 @@ function ToolCallDrawer({
   );
 }
 
-function MarkdownBody({ text }: { text: string }) {
-  const blocks = parseMarkdownBlocks(text);
-  return (
-    <div className="flex flex-col gap-3 text-[15px] leading-7 text-fg-black">
-      {blocks.map((b, i) =>
-        b.type === "code" ? (
-          <pre
-            key={i}
-            className="overflow-x-auto rounded-xl bg-fg-grey-900 px-4 py-3 font-mono text-sm leading-6 text-white"
-          >
-            <code>{b.content}</code>
-          </pre>
-        ) : (
-          <p key={i} dangerouslySetInnerHTML={{ __html: renderInline(b.content) }} />
-        ),
-      )}
-    </div>
-  );
-}
-
-function MessageActions({
-  time,
-  latency,
-  sources,
-  onOpenSources,
-}: {
-  time: string;
-  latency?: string;
-  sources: Source[];
-  onOpenSources: () => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-3 text-xs text-fg-grey-500">
-      <ActionBtn icon={<CopyLinear size={13} color="currentColor" />} label="复制" />
-      <ActionBtn icon={<RefreshLinear size={13} color="currentColor" />} label="重新生成" />
-      <span className="text-fg-grey-400">·</span>
-      <span>{time}</span>
-      {latency && (
-        <>
-          <span className="text-fg-grey-400">·</span>
-          <span>{latency}</span>
-        </>
-      )}
-      {sources.length > 0 && (
-        <button
-          type="button"
-          onClick={onOpenSources}
-          className="ml-auto flex items-center gap-2 rounded-full border border-fg-grey-200 bg-white px-2.5 py-1 text-xs font-medium text-fg-grey-900 transition hover:border-fg-violet"
-        >
-          <span className="flex -space-x-1.5">
-            {sources.slice(0, 3).map((s) => (
-              <img
-                key={s.id}
-                src={s.favicon}
-                alt=""
-                className="size-4 rounded-full ring-2 ring-white"
-              />
-            ))}
-          </span>
-          <span>{sources.length} 个来源</span>
-        </button>
-      )}
-    </div>
-  );
-}
-
-function ActionBtn({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <button
-      type="button"
-      className="flex items-center gap-1 transition hover:text-fg-grey-900"
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
-
-function FollowUps({ items }: { items: string[] }) {
-  return (
-    <div className="mt-1 flex flex-col">
-      {items.map((q, i) => (
-        <button
-          key={i}
-          type="button"
-          className={`flex items-center gap-2 py-2 text-left text-sm text-fg-grey-900 transition hover:text-fg-violet ${
-            i > 0 ? "border-t border-fg-grey-100" : ""
-          }`}
-        >
-          <ArrowLeftDownLinear size={14} color="#A1A1AA" />
-          <span>{q}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function SourcesDrawer({
   sources,
   onClose,
 }: {
-  sources: Source[];
+  sources: ChatSource[];
   onClose: () => void;
 }) {
   return (
@@ -635,7 +530,7 @@ function SourcesDrawer({
             aria-label="关闭"
             className="flex size-8 items-center justify-center rounded-full text-fg-grey-700 hover:bg-fg-grey-100"
           >
-            <CloseCircleLinear size={20} color="currentColor" />
+            <CloseSquareLinear size={20} color="currentColor" />
           </button>
         </header>
         <div className="flex-1 overflow-y-auto p-5">
@@ -706,7 +601,7 @@ function ThinkingDrawer({
             aria-label="关闭"
             className="flex size-8 items-center justify-center rounded-full text-fg-grey-700 hover:bg-fg-grey-100"
           >
-            <CloseCircleLinear size={20} color="currentColor" />
+            <CloseSquareLinear size={20} color="currentColor" />
           </button>
         </header>
         <div className="flex-1 overflow-y-auto p-5">
@@ -738,26 +633,3 @@ function ThinkingDrawer({
 // 极简 markdown 解析（demo 用）
 // ============================================================
 
-function parseMarkdownBlocks(text: string): { type: "p" | "code"; content: string }[] {
-  const out: { type: "p" | "code"; content: string }[] = [];
-  const parts = text.split(/```(\w*)\n?/);
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 3 === 0) {
-      const trimmed = parts[i].trim();
-      if (trimmed) out.push({ type: "p", content: trimmed });
-    } else if (i % 3 === 2) {
-      out.push({ type: "code", content: parts[i].replace(/\n```$/, "").trim() });
-    }
-  }
-  return out;
-}
-
-function renderInline(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-fg-grey-100 font-mono text-[13px]">$1</code>')
-    .replace(/\n/g, "<br />");
-}

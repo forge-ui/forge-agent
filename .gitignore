@@ -9,3 +9,5 @@ dist
 .env.*.local
 next-env.d.ts
 tsconfig.tsbuildinfo
+.gstack/
+.spec-workflow/

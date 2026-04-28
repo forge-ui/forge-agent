@@ -18,7 +18,7 @@ export function MarkdownBody({ text }: { text: string }) {
         b.type === "code" ? (
           <pre
             key={i}
-            className="overflow-x-auto rounded-xl bg-fg-grey-900 px-4 py-3 font-mono text-sm leading-6 text-white"
+            className="overflow-x-auto rounded-xl border border-fg-grey-200 bg-white px-4 py-3 font-mono text-sm leading-6 text-fg-grey-900"
           >
             <code>{b.content}</code>
           </pre>

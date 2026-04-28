@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
+import { PlusIcon } from "@forge-ui/react";
 import {
-  AddCircleBold,
   ChatRoundLineLinear,
   LibraryBoldDuotone,
   SettingsBoldDuotone,
@@ -17,11 +17,10 @@ import {
 
 const GROUP_LABEL: Record<ConversationGroup, string> = {
   today: "今天",
-  yesterday: "昨天",
   earlier: "更早",
 };
 
-const GROUP_ORDER: ConversationGroup[] = ["today", "yesterday", "earlier"];
+const GROUP_ORDER: ConversationGroup[] = ["today", "earlier"];
 
 export function ChatSidebar() {
   const params = useParams<{ appId?: string }>();
@@ -41,7 +40,7 @@ export function ChatSidebar() {
         href={`/${app.slug}/chat`}
         className="flex items-center justify-center gap-2 rounded-xl bg-fg-violet px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700"
       >
-        <AddCircleBold size={16} color="#fff" />
+        <PlusIcon size={16} />
         新对话
       </Link>
 
@@ -56,7 +55,7 @@ export function ChatSidebar() {
                 {GROUP_LABEL[g]}
               </div>
               {items.map((c) => (
-                <ChatRow key={c.id} conv={c} />
+                <ChatRow key={c.id} conv={c} slug={app.slug} />
               ))}
             </div>
           );
@@ -82,15 +81,15 @@ export function ChatSidebar() {
   );
 }
 
-function ChatRow({ conv }: { conv: Conversation }) {
+function ChatRow({ conv, slug }: { conv: Conversation; slug: string }) {
   return (
-    <button
-      type="button"
+    <Link
+      href={`/${slug}/chat?c=${conv.id}`}
       className="flex items-center gap-2 truncate rounded-lg px-3 py-2 text-left text-sm text-fg-grey-900 transition hover:bg-fg-grey-100"
     >
       <ChatRoundLineLinear size={14} color="#71717A" />
       <span className="truncate">{conv.title}</span>
-    </button>
+    </Link>
   );
 }
 

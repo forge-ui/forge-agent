@@ -74,6 +74,7 @@ export function AppShell({
       teamName={currentApp.name}
       teamSubtitle={currentApp.tagline}
       teams={teams}
+      teamLabels={{ invite: "邀请成员", settings: "应用设置", createNew: "新建应用" }}
       sidebarSlot={<ChatSidebar />}
       hideSidebarWidgets
       profile={profile}

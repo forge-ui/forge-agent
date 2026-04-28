@@ -1,16 +1,14 @@
 import { type ComponentType } from "react";
 import {
+  ChatRoundDotsBoldDuotone,
   CodeSquareBoldDuotone,
-  NotebookBoldDuotone,
-  PenNewSquareBoldDuotone,
-  GraphBoldDuotone,
 } from "solar-icon-set";
 
 export type AppAccent = "purple" | "blue" | "emerald" | "amber";
 
 export type ChatSuggestion = { title: string; body: string };
 
-export type ConversationGroup = "today" | "yesterday" | "earlier";
+export type ConversationGroup = "today" | "earlier";
 
 export type Conversation = {
   id: string;
@@ -33,16 +31,40 @@ export type ForgeApp = {
   conversations: Conversation[];
 };
 
-// 占位 App 列表 —— 后续从配置 / 后端接入
 export const apps: ForgeApp[] = [
   {
-    id: "code-studio",
-    slug: "code-studio",
-    name: "Code Studio",
-    tagline: "Code review, refactor, debug",
-    description: "你的代码搭子，盯着 PR、揪 bug、给重构建议。",
-    icon: CodeSquareBoldDuotone,
+    id: "general",
+    slug: "general",
+    name: "通用Agent",
+    tagline: "邮件 / 计划 / 查资料，什么都聊",
+    description: "你的全能助理，不挑场景。",
+    icon: ChatRoundDotsBoldDuotone,
     accent: "purple",
+    heroIllustration: "/chat-mascot.png",
+    suggestions: [
+      { title: "帮我写一份周报", body: "贴本周做的事，输出结构化周报。" },
+      { title: "总结这份会议纪要", body: "提取决策、行动项、负责人。" },
+      { title: "今天的 AI 新闻有哪些", body: "挑值得跟的，给一句话点评。" },
+      { title: "明天演讲的提纲", body: "受众 + 时长 + 立意，给一份大纲。" },
+    ],
+    conversations: [
+      { id: "g-1", title: "整理 Q2 OKR", group: "today" },
+      { id: "g-2", title: "改写产品周会纪要", group: "today" },
+      { id: "g-3", title: "回一封拒绝邀约的邮件", group: "today" },
+      { id: "g-4", title: "下周深圳出差怎么安排", group: "earlier" },
+      { id: "g-5", title: "讲讲 SQL window functions", group: "earlier" },
+      { id: "g-6", title: "给老板写一封感谢信", group: "earlier" },
+      { id: "g-7", title: "为啥 Q1 转化率掉了 8%", group: "earlier" },
+    ],
+  },
+  {
+    id: "coding",
+    slug: "coding",
+    name: "编程Agent",
+    tagline: "PR 评审 / 重构 / Bug 排查",
+    description: "你的代码搭子，盯 PR、揪 bug、给重构建议。",
+    icon: CodeSquareBoldDuotone,
+    accent: "blue",
     heroIllustration: "/chat-mascot.png",
     suggestions: [
       { title: "帮我审一下这个 PR", body: "找回归、安全隐患、粗糙的边界条件。" },
@@ -54,63 +76,10 @@ export const apps: ForgeApp[] = [
       { id: "c-1", title: "改下登录页样式", group: "today" },
       { id: "c-2", title: "PR #234 review", group: "today" },
       { id: "c-3", title: "Tailwind v4 @source 解释", group: "today" },
-      { id: "c-4", title: "重构 user-service hooks", group: "yesterday" },
-      { id: "c-5", title: "修 vitest mock fetch 的报错", group: "yesterday" },
+      { id: "c-4", title: "重构 user-service hooks", group: "earlier" },
+      { id: "c-5", title: "修 vitest mock fetch 的报错", group: "earlier" },
       { id: "c-6", title: "Migration 失败排查", group: "earlier" },
       { id: "c-7", title: "Server Component 不能用 useState?", group: "earlier" },
-    ],
-  },
-  {
-    id: "research-lab",
-    slug: "research-lab",
-    name: "Research Lab",
-    tagline: "Search, compare, cite",
-    description: "调研助手，搜索整合多源资料，每条结论都带引用。",
-    icon: NotebookBoldDuotone,
-    accent: "blue",
-    suggestions: [
-      { title: "对比 X 和 Y", body: "结构化对照，每条结论带来源。" },
-      { title: "总结这篇论文", body: "贴 PDF 或链接，输出结构化摘要。" },
-      { title: "帮我找资料", body: "可靠、近期、带引用。" },
-    ],
-    conversations: [
-      { id: "r-1", title: "对比 LangChain vs LlamaIndex", group: "today" },
-      { id: "r-2", title: "找 RAG 最新论文", group: "yesterday" },
-    ],
-  },
-  {
-    id: "writing-desk",
-    slug: "writing-desk",
-    name: "Writing Desk",
-    tagline: "Edit, polish, restructure",
-    description: "写作教练，砍冗余、理逻辑、润语气。",
-    icon: PenNewSquareBoldDuotone,
-    accent: "emerald",
-    suggestions: [
-      { title: "压缩这篇草稿", body: "砍冗余，论点更利。" },
-      { title: "换个语气", body: "更有力 / 更亲和 / 更正式。" },
-      { title: "重排大纲", body: "用最强论点开头。" },
-    ],
-    conversations: [
-      { id: "w-1", title: "公众号文章润色", group: "today" },
-      { id: "w-2", title: "PR description 改写", group: "earlier" },
-    ],
-  },
-  {
-    id: "data-console",
-    slug: "data-console",
-    name: "Data Console",
-    tagline: "Clean, model, visualize",
-    description: "数据助手，自动清洗 / 建模 / 可视化。",
-    icon: GraphBoldDuotone,
-    accent: "amber",
-    suggestions: [
-      { title: "清洗 CSV", body: "丢空值、规范列、去重。" },
-      { title: "找趋势", body: "快速统计 + 一张说人话的图。" },
-      { title: "搭个 dashboard", body: "按列选合适的图。" },
-    ],
-    conversations: [
-      { id: "d-1", title: "Q1 销售数据透视", group: "today" },
     ],
   },
 ];

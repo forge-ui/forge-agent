@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 import { PlusIcon } from "@forge-ui/react";
 import {
   ChatRoundLineLinear,
@@ -25,6 +25,7 @@ const GROUP_ORDER: ConversationGroup[] = ["today", "earlier"];
 export function ChatSidebar() {
   const params = useParams<{ appId?: string }>();
   const pathname = usePathname() ?? "";
+  const activeConversationId = useSearchParams().get("c");
   const slug = params?.appId ?? DEFAULT_APP_SLUG;
   const app = getAppBySlug(slug) ?? getAppBySlug(DEFAULT_APP_SLUG)!;
 
@@ -38,7 +39,7 @@ export function ChatSidebar() {
       {/* + 新对话 */}
       <Link
         href={`/${app.slug}/chat`}
-        className="flex items-center justify-center gap-2 rounded-xl bg-fg-violet px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700"
+        className="flex items-center justify-center gap-2 rounded-xl bg-fg-blue-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-fg-blue-700"
       >
         <PlusIcon size={16} />
         新对话
@@ -55,7 +56,12 @@ export function ChatSidebar() {
                 {GROUP_LABEL[g]}
               </div>
               {items.map((c) => (
-                <ChatRow key={c.id} conv={c} slug={app.slug} />
+                <ChatRow
+                  key={c.id}
+                  conv={c}
+                  slug={app.slug}
+                  active={activeConversationId === c.id}
+                />
               ))}
             </div>
           );
@@ -68,7 +74,7 @@ export function ChatSidebar() {
           href={knowledgeHref}
           active={pathname.startsWith(knowledgeHref)}
           icon={<LibraryBoldDuotone size={18} />}
-          label="知识库"
+          label="工作记忆"
         />
         <SidebarLink
           href={settingsHref}
@@ -81,13 +87,28 @@ export function ChatSidebar() {
   );
 }
 
-function ChatRow({ conv, slug }: { conv: Conversation; slug: string }) {
+function ChatRow({
+  conv,
+  slug,
+  active,
+}: {
+  conv: Conversation;
+  slug: string;
+  active: boolean;
+}) {
   return (
     <Link
       href={`/${slug}/chat?c=${conv.id}`}
-      className="flex items-center gap-2 truncate rounded-lg px-3 py-2 text-left text-sm text-fg-grey-900 transition hover:bg-fg-grey-100"
+      className={
+        active
+          ? "flex items-center gap-2 truncate rounded-lg bg-fg-blue-100 px-3 py-2 text-left text-sm font-semibold text-fg-blue-700 transition hover:bg-fg-blue-100"
+          : "flex items-center gap-2 truncate rounded-lg px-3 py-2 text-left text-sm text-fg-grey-900 transition hover:bg-fg-grey-100"
+      }
     >
-      <ChatRoundLineLinear size={14} color="#71717A" />
+      <ChatRoundLineLinear
+        size={14}
+        color={active ? "var(--fg-blue-700)" : "var(--fg-grey-700)"}
+      />
       <span className="truncate">{conv.title}</span>
     </Link>
   );
@@ -109,7 +130,7 @@ function SidebarLink({
       href={href}
       className={
         active
-          ? "flex items-center gap-3 rounded-xl bg-fg-violet px-3 py-2.5 text-sm font-semibold text-white"
+          ? "flex items-center gap-3 rounded-xl bg-fg-blue-500 px-3 py-2.5 text-sm font-semibold text-white"
           : "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-fg-grey-900 hover:bg-fg-grey-100"
       }
     >

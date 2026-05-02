@@ -29,10 +29,10 @@ export function highlightSql(sql: string) {
   );
   return escaped.replace(re, (_m, com, str, fn, kw, num) => {
     if (com) return `<span class="text-fg-grey-500 italic">${com}</span>`;
-    if (str) return `<span class="text-emerald-700">${str}</span>`;
-    if (fn) return `<span class="text-cyan-700">${fn}</span>`;
-    if (kw) return `<span class="text-violet-700 font-semibold">${kw}</span>`;
-    if (num) return `<span class="text-amber-700">${num}</span>`;
+    if (str) return `<span class="text-fg-green-700">${str}</span>`;
+    if (fn) return `<span class="text-fg-cyan-700">${fn}</span>`;
+    if (kw) return `<span class="text-fg-blue-700 font-semibold">${kw}</span>`;
+    if (num) return `<span class="text-fg-yellow-700">${num}</span>`;
     return _m;
   });
 }

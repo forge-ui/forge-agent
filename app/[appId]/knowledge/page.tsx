@@ -1,10 +1,15 @@
 import { AppShell } from "@/app/_components/app-shell";
-import { PagePlaceholder } from "@/app/_components/page-placeholder";
+import { MemoryWorkbench } from "@/app/_components/memory/memory-workbench";
 
 export default function KnowledgePage() {
   return (
-    <AppShell pageTitle="知识库" primaryAction={{ label: "上传文件" }}>
-      <PagePlaceholder pageLabel="知识库" description="这里放当前 App 能读到的文件。" />
+    <AppShell
+      pageTitle="工作记忆"
+      primaryAction={{ label: "整理最近对话" }}
+      secondaryAction={{ label: "导入规范" }}
+      searchPlaceholder="搜索偏好、技能、规则..."
+    >
+      <MemoryWorkbench />
     </AppShell>
   );
 }

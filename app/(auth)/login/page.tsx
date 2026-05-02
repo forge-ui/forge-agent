@@ -55,7 +55,7 @@ export default function LoginPage() {
           headerAction={
             <Link
               href="/forgot-password"
-              className="text-sm font-bold text-fg-violet hover:underline"
+              className="text-sm font-bold text-fg-blue-500 hover:underline"
             >
               Forgot password
             </Link>
@@ -72,14 +72,14 @@ export default function LoginPage() {
           }
         />
 
-        <Button type="submit" color="purple" variant="primary" size="lg" className="w-full">
+        <Button type="submit" color="blue" variant="primary" size="lg" className="w-full">
           Log in
         </Button>
       </div>
 
       <p className="text-center text-sm text-fg-grey-700">
         Don&apos;t have an account?{" "}
-        <Link href="/register" className="font-bold text-fg-violet hover:underline">
+        <Link href="/register" className="font-bold text-fg-blue-500 hover:underline">
           Register now
         </Link>
       </p>

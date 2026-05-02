@@ -59,11 +59,11 @@ function SchemaTableNode({
       >
         <div className="flex items-center gap-2 min-w-0">
           {open ? (
-            <AltArrowDownLinear size={13} color="#71717A" />
+            <AltArrowDownLinear size={13} color="var(--fg-grey-700)" />
           ) : (
-            <AltArrowRightLinear size={13} color="#71717A" />
+            <AltArrowRightLinear size={13} color="var(--fg-grey-700)" />
           )}
-          <LayersMinimalisticLinear size={14} color="#7C3AED" />
+          <LayersMinimalisticLinear size={14} color="var(--fg-blue)" />
           <span className="font-mono text-sm font-semibold text-fg-black">{table.name}</span>
           {table.comment && (
             <span className="truncate text-xs text-fg-grey-700">— {table.comment}</span>
@@ -93,12 +93,12 @@ function SchemaTableNode({
                   <td className="px-3 py-1.5">
                     {c.isPK && (
                       <span title="Primary Key">
-                        <KeyMinimalisticBoldDuotone size={12} color="#D97706" />
+                        <KeyMinimalisticBoldDuotone size={12} color="var(--fg-yellow-600)" />
                       </span>
                     )}
                     {c.isFK && (
                       <span title={`FK → ${c.references?.table}.${c.references?.column}`}>
-                        <LinkBoldDuotone size={12} color="#0EA5E9" />
+                        <LinkBoldDuotone size={12} color="var(--fg-cyan-600)" />
                       </span>
                     )}
                   </td>
@@ -108,7 +108,7 @@ function SchemaTableNode({
                       {c.type}
                     </span>
                     {!c.nullable && (
-                      <span className="ml-1 text-[10px] font-semibold text-rose-600">NOT NULL</span>
+                      <span className="ml-1 text-[10px] font-semibold text-fg-red-600">NOT NULL</span>
                     )}
                   </td>
                   <td className="px-3 py-1.5 font-mono text-fg-grey-700">

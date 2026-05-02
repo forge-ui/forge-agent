@@ -27,8 +27,8 @@ export function SqlTab({ version }: { version: ReportVersion }) {
             <CopyLinear size={12} color="currentColor" />
             复制
           </button>
-          <button className="flex items-center gap-1 rounded bg-fg-violet px-3 py-1 text-xs font-semibold text-white hover:bg-violet-700">
-            <PlayCircleBold size={12} color="#fff" />
+          <button className="flex items-center gap-1 rounded bg-fg-blue-500 px-3 py-1 text-xs font-semibold text-white hover:bg-fg-blue-700">
+            <PlayCircleBold size={12} color="var(--fg-grey-50)" />
             执行
           </button>
         </div>
@@ -50,7 +50,7 @@ export function SqlTab({ version }: { version: ReportVersion }) {
       <div className="flex items-center justify-between gap-4 border-t border-fg-grey-200 bg-fg-grey-50 px-4 py-2 text-xs text-fg-grey-700">
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-emerald-500" />
+            <span className="size-2 rounded-full bg-fg-green-500" />
             执行成功
           </span>
           <span>·</span>

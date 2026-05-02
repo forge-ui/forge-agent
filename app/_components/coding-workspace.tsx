@@ -1,76 +1,79 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { CloseIcon } from "@forge-ui/react";
-import { ChatPillBar, type PillAction } from "./chat-pill-bar";
+/**
+ * CodingWorkspace — 编程 App 的 chat 工作区。
+ *
+ * 已迁移到 ArtifactWorkspace 通用容器；右侧 panel 走 ArtifactRegistry 渲染
+ * （当前 mock 数据走 report artifact），左侧消息流保留原视觉。
+ */
+
+import { useState } from "react";
 import {
   AltArrowDownLinear,
   AltArrowRightLinear,
+  ChartLinear,
+  CodeLinear,
   DatabaseLinear,
   DocumentTextLinear,
-  FullScreenLinear,
-  QuitFullScreenLinear,
   GlobalLinear,
   LightbulbBoldDuotone,
   MagniferLinear,
   PaperclipLinear,
   PlayCircleBold,
-  LayersMinimalisticLinear,
-  ChartLinear,
-  CodeLinear,
 } from "solar-icon-set";
+import { ArtifactCard } from "./artifact-card";
 import {
-  type ArtifactTab,
+  ArtifactWorkspace,
+  type ArtifactWorkspaceController,
+  type ArtifactWorkspaceLayout,
+} from "./artifact-workspace";
+import { ChatPillBar, type PillAction } from "./chat-pill-bar";
+import { FollowUps, MarkdownBody, MessageActions } from "./chat-shared";
+import {
   type AssistantStep,
-  type ReportArtifact,
-  type ReportVersion,
-  reportArtifact,
   reportMessages,
 } from "@/app/_mock/report-artifact";
-import { FollowUps, MarkdownBody, MessageActions } from "./chat-shared";
-import { SqlTab } from "./coding/sql-tab";
-import { ResultTab } from "./coding/result-tab";
-import { ReportTab } from "./coding/report-tab";
-import { SchemaTab } from "./coding/schema-tab";
-
-// ============================================================
-// Tabs
-// ============================================================
-
-const TABS: { id: ArtifactTab; label: string; icon: React.ReactNode }[] = [
-  { id: "sql", label: "SQL", icon: <CodeLinear size={14} color="currentColor" /> },
-  { id: "result", label: "结果", icon: <LayersMinimalisticLinear size={14} color="currentColor" /> },
-  { id: "report", label: "报表", icon: <DocumentTextLinear size={14} color="currentColor" /> },
-  { id: "schema", label: "Schema", icon: <DatabaseLinear size={14} color="currentColor" /> },
-];
+import {
+  getMockArtifacts,
+  getMockExtraMessages,
+  type ExtraArtifactRef,
+} from "@/app/_mock/artifacts";
 
 // ============================================================
 // Workspace
 // ============================================================
 
-type PanelMode = "closed" | "split" | "fullscreen";
+export function CodingWorkspace({ conversationId }: { conversationId: string }) {
+  const artifacts = getMockArtifacts("coding");
 
-const SPRING = "cubic-bezier(0.32, 0.72, 0, 1)";
-// Chat wrapper 占 workspace 全宽，chat 内容用 max-w 切换：panel 开 = CHAT_MAX 靠左、关 = 820 居中。
-// PANEL_W 公式：workspace 内宽 M = 6(pl) + chat 区(≥CHAT_MAX) + 12(gap) + panel + 6(pr)，所以 panel = M - CHAT_MAX - 24。
-const CHAT_MAX = 460;
-const PANEL_W = `calc(100% - ${CHAT_MAX + 24}px)`;
+  return (
+    <ArtifactWorkspace key={conversationId} artifacts={artifacts}>
+      {(controller, layout) => (
+        <CodingChatStream
+          controller={controller}
+          conversationId={conversationId}
+          layout={layout}
+        />
+      )}
+    </ArtifactWorkspace>
+  );
+}
 
-export function CodingWorkspace() {
-  const [panelMode, setPanelMode] = useState<PanelMode>("split");
-  const [activeTab, setActiveTab] = useState<ArtifactTab>("report");
-  const [activeVersionId, setActiveVersionId] = useState(reportArtifact.activeVersionId);
+// ============================================================
+// Chat stream — 渲染 reportMessages，AI 消息内的 artifact 卡片走新组件
+// ============================================================
+
+function CodingChatStream({
+  controller,
+  conversationId,
+  layout,
+}: {
+  controller: ArtifactWorkspaceController;
+  conversationId: string;
+  layout: ArtifactWorkspaceLayout;
+}) {
   const [draft, setDraft] = useState("");
   const [chatMode, setChatMode] = useState<"think" | "search" | null>(null);
-
-  const artifact = reportArtifact;
-  const version = useMemo(
-    () => artifact.versions.find((v) => v.id === activeVersionId) ?? artifact.versions[0],
-    [artifact, activeVersionId],
-  );
-
-  const isOpen = panelMode !== "closed";
-  const isFull = panelMode === "fullscreen";
 
   const pillActions: PillAction[] = [
     {
@@ -96,147 +99,62 @@ export function CodingWorkspace() {
     },
   ];
 
-  const chatPaddingRight = isOpen ? `calc(${PANEL_W} + 12px)` : "0px";
-  const panelTransform = isOpen ? "translateX(0)" : "translateX(calc(100% + 12px))";
-  const panelWidth = isFull ? "calc(100% - 24px)" : PANEL_W;
-
-  function openArtifact(tab?: ArtifactTab) {
-    setPanelMode((m) => (m === "closed" ? "split" : m));
-    if (tab) setActiveTab(tab);
-  }
+  const baseMessages = conversationId === "c-1" ? reportMessages : [];
+  const extraMessages = getMockExtraMessages("coding", conversationId);
+  const chatColumnStyle = {
+    maxWidth: `${layout.chatMaxWidth}px`,
+    marginLeft: layout.isPanelOpen ? "0" : "auto",
+    marginRight: "auto",
+    transition: "max-width 380ms cubic-bezier(0.32, 0.72, 0, 1)",
+  };
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] overflow-hidden p-1.5 -mr-6">
-      {/* Chat card — 独立白卡 */}
-      <div
-        className="h-full"
-        style={{
-          paddingRight: chatPaddingRight,
-          transition: `padding-right 350ms ${SPRING}`,
-        }}
-      >
-        <div className="flex h-full flex-col overflow-y-auto">
-          <main className="flex-1 px-4 pt-8 pb-4">
-            <div
-              className="flex flex-col gap-6"
-              style={{
-                maxWidth: isOpen ? `${CHAT_MAX}px` : "820px",
-                marginLeft: isOpen ? "0" : "auto",
-                marginRight: "auto",
-                transition: `max-width 380ms ${SPRING}`,
-              }}
-            >
-              {reportMessages.map((m) =>
-                m.role === "user" ? (
-                  <UserMessage key={m.id} content={m.content} time={m.time} />
-                ) : (
-                  <AssistantMessage
-                    key={m.id}
-                    content={m.content}
-                    time={m.time}
-                    latency={m.latency}
-                    steps={m.steps}
-                    followUps={m.followUps}
-                    artifact={m.artifactId === artifact.id ? artifact : null}
-                    version={version}
-                    onOpen={openArtifact}
-                  />
-                ),
-              )}
-            </div>
-          </main>
-          <div className="sticky bottom-0 bg-gradient-to-t from-fg-grey-50 via-fg-grey-50/95 to-transparent px-4 pb-1 pt-4">
-            <div
-              style={{
-                maxWidth: isOpen ? `${CHAT_MAX}px` : "820px",
-                marginLeft: isOpen ? "0" : "auto",
-                marginRight: "auto",
-                transition: `max-width 380ms ${SPRING}`,
-              }}
-            >
-              <ChatPillBar
-                placeholder="问点别的数据，比如「再看下产品类目维度」"
-                value={draft}
-                onChange={setDraft}
-                onSend={() => setDraft("")}
-                actions={pillActions}
+    <div className="relative flex h-full flex-col overflow-hidden">
+      <main className="flex-1 overflow-y-auto px-4 pt-8 pb-44">
+        <div className="flex w-full flex-col gap-6" style={chatColumnStyle}>
+          {baseMessages.map((m) =>
+            m.role === "user" ? (
+              <UserMessage key={m.id} content={m.content} time={m.time} />
+            ) : (
+              <AssistantMessage
+                key={m.id}
+                content={m.content}
+                time={m.time}
+                latency={m.latency}
+                steps={m.steps}
+                followUps={m.followUps}
+                artifactId={m.artifactId}
+                onOpenArtifact={controller.openArtifact}
               />
-            </div>
-          </div>
+            ),
+          )}
+          {extraMessages.map((m) =>
+            m.role === "user" ? (
+              <UserMessage key={m.id} content={m.content} time={m.time} />
+            ) : (
+              <AssistantMessage
+                key={m.id}
+                content={m.content}
+                time={m.time}
+                artifactRef={m.artifactRef}
+                onOpenArtifact={controller.openArtifact}
+              />
+            ),
+          )}
         </div>
-      </div>
-
-      {/* Artifact card — 独立灰卡 */}
-      <div
-        aria-hidden={!isOpen}
-        className="absolute top-1.5 right-1.5 bottom-1.5"
-        style={{
-          width: panelWidth,
-          transform: panelTransform,
-          opacity: isOpen ? 1 : 0,
-          transition: `transform 380ms ${SPRING}, width 380ms ${SPRING}, opacity 220ms ease-out`,
-          pointerEvents: isOpen ? "auto" : "none",
-          willChange: "transform, width",
-        }}
-      >
-        <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-fg-grey-200 bg-white">
-          <SidePanel
-            artifact={artifact}
-            version={version}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            activeVersionId={activeVersionId}
-            onVersionChange={setActiveVersionId}
-            isFullscreen={isFull}
-            onToggleFullscreen={() => setPanelMode(isFull ? "split" : "fullscreen")}
-            onClose={() => setPanelMode("closed")}
+      </main>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-fg-grey-50 via-fg-grey-50/95 to-transparent px-4 pb-6 pt-10">
+        <div className="pointer-events-auto w-full" style={chatColumnStyle}>
+          <ChatPillBar
+            placeholder="问点别的数据，比如「再看下产品类目维度」"
+            value={draft}
+            onChange={setDraft}
+            onSend={() => setDraft("")}
+            actions={pillActions}
           />
         </div>
       </div>
     </div>
-  );
-}
-
-// ============================================================
-// Splitter
-// ============================================================
-
-function Splitter({ onChange }: { onChange: (ratio: number) => void }) {
-  const dragging = useRef(false);
-
-  useEffect(() => {
-    function onMove(e: MouseEvent) {
-      if (!dragging.current) return;
-      const w = window.innerWidth;
-      const r = Math.max(0.25, Math.min(0.75, e.clientX / w));
-      onChange(r);
-    }
-    function onUp() {
-      dragging.current = false;
-      document.body.style.cursor = "";
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    }
-    function start() {
-      dragging.current = true;
-      document.body.style.cursor = "col-resize";
-      window.addEventListener("mousemove", onMove);
-      window.addEventListener("mouseup", onUp);
-    }
-    const node = document.getElementById("__splitter");
-    node?.addEventListener("mousedown", start);
-    return () => {
-      node?.removeEventListener("mousedown", start);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, [onChange]);
-
-  return (
-    <div
-      id="__splitter"
-      className="w-1 shrink-0 cursor-col-resize bg-fg-grey-100 transition hover:bg-fg-violet/40"
-    />
   );
 }
 
@@ -263,28 +181,50 @@ function AssistantMessage({
   latency,
   steps,
   followUps,
-  artifact,
-  version,
-  onOpen,
+  artifactId,
+  artifactRef,
+  onOpenArtifact,
 }: {
   content: string;
   time: string;
   latency?: string;
   steps?: AssistantStep[];
   followUps?: string[];
-  artifact: ReportArtifact | null;
-  version: ReportVersion;
-  onOpen: (tab?: ArtifactTab) => void;
+  artifactId?: string;
+  artifactRef?: ExtraArtifactRef;
+  onOpenArtifact: (id: string) => void;
 }) {
+  // artifactRef 优先（来自新 mock），其次回退到 reportMessages 的 artifactId（默认 report 类型）
+  const cardProps = artifactRef
+    ? {
+        artifactId: artifactRef.artifactId,
+        action: "update" as const,
+        preview: {
+          type: artifactRef.type,
+          title: artifactRef.title,
+          subtitle: artifactRef.subtitle,
+        },
+      }
+    : artifactId
+      ? {
+          artifactId,
+          action: "update" as const,
+          preview: {
+            type: "report" as const,
+            title: "销售订单分析",
+            subtitle: "SQL · 结果 · 报表 · Schema",
+          },
+        }
+      : null;
+
   return (
     <div className="flex flex-col gap-3">
       {steps && steps.length > 0 && <StepList steps={steps} />}
       <MarkdownBody text={content} />
-      {artifact && (
+      {cardProps && (
         <ArtifactCard
-          artifact={artifact}
-          version={version}
-          onOpen={onOpen}
+          {...cardProps}
+          onOpen={onOpenArtifact}
         />
       )}
       <MessageActions time={time} latency={latency} />
@@ -294,20 +234,20 @@ function AssistantMessage({
 }
 
 // ============================================================
-// Step list — AI 思考/查询过程
+// Step list — AI 思考/查询过程（保留现有视觉）
 // ============================================================
 
 const STEP_META: Record<
   AssistantStep["kind"],
   { icon: React.ReactNode; tone: string }
 > = {
-  understanding: { icon: <LightbulbBoldDuotone size={13} color="#7C3AED" />, tone: "bg-purple-100" },
-  schema_explore: { icon: <DatabaseLinear size={13} color="#0369A1" />, tone: "bg-sky-100" },
-  sql_draft: { icon: <CodeLinear size={13} color="#0F766E" />, tone: "bg-teal-100" },
-  executing: { icon: <PlayCircleBold size={13} color="#D97706" />, tone: "bg-amber-100" },
-  analyzing: { icon: <MagniferLinear size={13} color="#6D28D9" />, tone: "bg-violet-100" },
-  chart_suggest: { icon: <ChartLinear size={13} color="#0E7490" />, tone: "bg-cyan-100" },
-  narrative: { icon: <DocumentTextLinear size={13} color="#374151" />, tone: "bg-fg-grey-100" },
+  understanding: { icon: <LightbulbBoldDuotone size={13} color="var(--fg-blue)" />, tone: "bg-fg-blue-100" },
+  schema_explore: { icon: <DatabaseLinear size={13} color="var(--fg-blue-700)" />, tone: "bg-fg-blue-100" },
+  sql_draft: { icon: <CodeLinear size={13} color="var(--fg-green-700)" />, tone: "bg-fg-green-100" },
+  executing: { icon: <PlayCircleBold size={13} color="var(--fg-yellow-700)" />, tone: "bg-fg-yellow-100" },
+  analyzing: { icon: <MagniferLinear size={13} color="var(--fg-blue)" />, tone: "bg-fg-blue-100" },
+  chart_suggest: { icon: <ChartLinear size={13} color="var(--fg-cyan-700)" />, tone: "bg-fg-cyan-100" },
+  narrative: { icon: <DocumentTextLinear size={13} color="var(--fg-grey-800)" />, tone: "bg-fg-grey-100" },
 };
 
 function StepList({ steps }: { steps: AssistantStep[] }) {
@@ -321,7 +261,7 @@ function StepList({ steps }: { steps: AssistantStep[] }) {
         className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left transition hover:bg-fg-grey-50"
       >
         <div className="flex items-center gap-2 text-sm">
-          <span className="flex size-5 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">
+          <span className="flex size-5 items-center justify-center rounded-full bg-fg-green-100 text-[10px] font-bold text-fg-green-700">
             {okCount}
           </span>
           <span className="font-semibold text-fg-black">已执行 {steps.length} 步</span>
@@ -331,9 +271,9 @@ function StepList({ steps }: { steps: AssistantStep[] }) {
           </span>
         </div>
         {open ? (
-          <AltArrowDownLinear size={14} color="#71717A" />
+          <AltArrowDownLinear size={14} color="var(--fg-grey-700)" />
         ) : (
-          <AltArrowRightLinear size={14} color="#71717A" />
+          <AltArrowRightLinear size={14} color="var(--fg-grey-700)" />
         )}
       </button>
       {open && (
@@ -357,196 +297,6 @@ function StepList({ steps }: { steps: AssistantStep[] }) {
           })}
         </ol>
       )}
-    </div>
-  );
-}
-
-// ============================================================
-// Artifact card (聊天里的小预览)
-// ============================================================
-
-function ArtifactCard({
-  artifact,
-  version,
-  onOpen,
-}: {
-  artifact: ReportArtifact;
-  version: ReportVersion;
-  onOpen: (tab?: ArtifactTab) => void;
-}) {
-  const counts = artifactCounts(version);
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen("report")}
-      className="group flex flex-col gap-3 rounded-2xl border border-fg-grey-200 bg-white p-4 text-left transition-colors duration-200 ease-out hover:border-fg-grey-400"
-    >
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-lg bg-purple-100">
-          <DocumentTextLinear size={16} color="#7C3AED" />
-        </div>
-        <div className="flex flex-col">
-          <span className="font-display text-sm font-semibold text-fg-black">{artifact.title}</span>
-          <span className="text-xs text-fg-grey-700">
-            {artifact.versions.length} 个版本 · 当前 {version.label} · {version.summary}
-          </span>
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        <Chip
-          icon={<CodeLinear size={11} color="currentColor" />}
-          label="SQL"
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpen("sql");
-          }}
-        />
-        <Chip
-          icon={<LayersMinimalisticLinear size={11} color="currentColor" />}
-          label={`${counts.result} 行结果`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpen("result");
-          }}
-        />
-        <Chip
-          icon={<DocumentTextLinear size={11} color="currentColor" />}
-          label={`${counts.report} 个区块`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpen("report");
-          }}
-        />
-      </div>
-    </button>
-  );
-}
-
-function Chip({
-  icon,
-  label,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  onClick?: (e: React.MouseEvent) => void;
-}) {
-  return (
-    <span
-      onClick={onClick}
-      className="flex cursor-pointer items-center gap-1 rounded-full bg-fg-grey-100 px-2.5 py-0.5 text-xs font-medium text-fg-grey-900 transition hover:bg-fg-violet hover:text-white"
-    >
-      {icon}
-      {label}
-    </span>
-  );
-}
-
-function artifactCounts(version: ReportVersion) {
-  return {
-    result: version.result.rowCount,
-    report: version.report.length,
-  };
-}
-
-// ============================================================
-// Side panel
-// ============================================================
-
-function SidePanel({
-  artifact,
-  version,
-  activeTab,
-  onTabChange,
-  activeVersionId,
-  onVersionChange,
-  isFullscreen,
-  onToggleFullscreen,
-  onClose,
-}: {
-  artifact: ReportArtifact;
-  version: ReportVersion;
-  activeTab: ArtifactTab;
-  onTabChange: (tab: ArtifactTab) => void;
-  activeVersionId: string;
-  onVersionChange: (id: string) => void;
-  isFullscreen: boolean;
-  onToggleFullscreen: () => void;
-  onClose: () => void;
-}) {
-  return (
-    <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between gap-3 border-b border-fg-grey-200 px-5 py-4">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="text-xs font-semibold uppercase tracking-wider text-fg-grey-700">
-            REPORT · {artifact.database.database}.{artifact.database.schema}
-          </span>
-          <span className="truncate font-display text-base font-bold text-fg-black">
-            {artifact.title}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={activeVersionId}
-            onChange={(e) => onVersionChange(e.target.value)}
-            className="cursor-pointer rounded-full border border-fg-grey-200 bg-white px-3 py-1.5 text-xs font-medium text-fg-grey-900 hover:border-fg-grey-400 focus:border-fg-violet focus:outline-none"
-          >
-            {artifact.versions.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.label} · {v.summary}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            onClick={onToggleFullscreen}
-            aria-label={isFullscreen ? "退出全屏" : "全屏"}
-            className="flex size-8 items-center justify-center rounded text-fg-grey-700 transition hover:bg-fg-grey-100 hover:text-fg-violet"
-          >
-            {isFullscreen ? (
-              <QuitFullScreenLinear size={18} color="currentColor" />
-            ) : (
-              <FullScreenLinear size={18} color="currentColor" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="关闭"
-            className="flex size-8 items-center justify-center rounded text-fg-grey-700 transition hover:bg-fg-grey-100 hover:text-fg-violet"
-          >
-            <CloseIcon size={20} />
-          </button>
-        </div>
-      </header>
-
-      <nav className="flex items-center gap-1 border-b border-fg-grey-200 px-3">
-        {TABS.map((t) => {
-          const isActive = activeTab === t.id;
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => onTabChange(t.id)}
-              className={
-                isActive
-                  ? "-mb-px flex items-center gap-1.5 border-b-2 border-fg-violet px-3 py-2.5 text-sm font-semibold text-fg-violet"
-                  : "-mb-px flex items-center gap-1.5 border-b-2 border-transparent px-3 py-2.5 text-sm font-medium text-fg-grey-700 transition hover:text-fg-black"
-              }
-            >
-              {t.icon}
-              {t.label}
-            </button>
-          );
-        })}
-      </nav>
-
-      <div className="flex-1 overflow-hidden">
-        {activeTab === "sql" && <SqlTab version={version} />}
-        {activeTab === "result" && <ResultTab result={version.result} />}
-        {activeTab === "report" && <ReportTab blocks={version.report} />}
-        {activeTab === "schema" && <SchemaTab database={artifact.database} />}
-      </div>
     </div>
   );
 }

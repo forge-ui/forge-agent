@@ -36,14 +36,14 @@ export default function ForgotPasswordPage() {
           onChange={setEmail}
         />
 
-        <Button type="submit" color="purple" variant="primary" size="lg" className="w-full">
+        <Button type="submit" color="blue" variant="primary" size="lg" className="w-full">
           Send Reset Instructions
         </Button>
       </div>
 
       <p className="text-center text-sm text-fg-grey-700">
         Back to log in page?{" "}
-        <Link href="/login" className="font-bold text-fg-violet hover:underline">
+        <Link href="/login" className="font-bold text-fg-blue-500 hover:underline">
           Back now
         </Link>
       </p>

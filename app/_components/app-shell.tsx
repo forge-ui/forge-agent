@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useMemo } from "react";
+import { Suspense, type ReactNode, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   AppLayout,
@@ -70,12 +70,16 @@ export function AppShell({
     <AppLayout
       mode="light"
       profilePosition="sidebar"
-      accent="purple"
+      accent="blue"
       teamName={currentApp.name}
       teamSubtitle={currentApp.tagline}
       teams={teams}
       teamLabels={{ invite: "邀请成员", settings: "应用设置", createNew: "新建应用" }}
-      sidebarSlot={<ChatSidebar />}
+      sidebarSlot={
+        <Suspense fallback={null}>
+          <ChatSidebar />
+        </Suspense>
+      }
       hideSidebarWidgets
       profile={profile}
       pageTitle={pageTitle}

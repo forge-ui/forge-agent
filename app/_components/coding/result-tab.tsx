@@ -68,7 +68,7 @@ export function ResultTab({ result }: { result: QueryResult }) {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 rounded-lg border border-fg-grey-200 bg-white px-2 py-1">
-            <MagniferLinear size={13} color="#71717A" />
+            <MagniferLinear size={13} color="var(--fg-grey-700)" />
             <input
               value={query}
               onChange={(e) => {
@@ -97,13 +97,13 @@ export function ResultTab({ result }: { result: QueryResult }) {
                 <th
                   key={c.key}
                   onClick={() => toggleSort(c.key)}
-                  className="cursor-pointer select-none px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-fg-grey-700 hover:text-fg-violet"
+                  className="cursor-pointer select-none px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-fg-grey-700 hover:text-fg-blue-500"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>{c.label}</span>
                     <ColumnTypeBadge type={c.type} />
                     {sort.key === c.key ? (
-                      <span className="text-fg-violet">{sort.dir === "asc" ? "↑" : "↓"}</span>
+                      <span className="text-fg-blue-500">{sort.dir === "asc" ? "↑" : "↓"}</span>
                     ) : (
                       <span className="text-fg-grey-300">↕</span>
                     )}
@@ -173,10 +173,10 @@ export function ResultTab({ result }: { result: QueryResult }) {
 export function ColumnTypeBadge({ type }: { type: ResultColumn["type"] }) {
   const map: Record<ResultColumn["type"], { bg: string; label: string }> = {
     string:   { bg: "bg-fg-grey-100 text-fg-grey-700", label: "abc" },
-    number:   { bg: "bg-blue-100 text-blue-700",        label: "123" },
-    money:    { bg: "bg-emerald-100 text-emerald-700",  label: "¥" },
-    date:     { bg: "bg-amber-100 text-amber-700",      label: "📅" },
-    category: { bg: "bg-purple-100 text-fg-violet",     label: "▣" },
+    number:   { bg: "bg-fg-blue-100 text-fg-blue-700",    label: "123" },
+    money:    { bg: "bg-fg-green-100 text-fg-green-700",  label: "¥" },
+    date:     { bg: "bg-fg-yellow-100 text-fg-yellow-700", label: "📅" },
+    category: { bg: "bg-fg-blue-100 text-fg-blue-500",    label: "▣" },
   };
   const m = map[type];
   return (

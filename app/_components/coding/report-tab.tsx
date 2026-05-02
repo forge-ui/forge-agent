@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -10,7 +11,6 @@ import {
   LineChart,
   Pie,
   PieChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -122,9 +122,9 @@ function KpiRow({ block }: { block: KpiBlock }) {
             <span
               className={`flex items-center gap-1 text-xs font-semibold ${
                 k.trend === "up"
-                  ? "text-emerald-600"
+                  ? "text-fg-green-600"
                   : k.trend === "down"
-                  ? "text-rose-600"
+                  ? "text-fg-red-600"
                   : "text-fg-grey-700"
               }`}
             >
@@ -140,38 +140,59 @@ function KpiRow({ block }: { block: KpiBlock }) {
 }
 
 const CHART_COLORS = [
-  "#7C3AED", // violet
-  "#0EA5E9", // sky
-  "#10B981", // emerald
-  "#F59E0B", // amber
-  "#EF4444", // rose
-  "#6366F1", // indigo
-  "#06B6D4", // cyan
-  "#EC4899", // pink
+  "var(--fg-blue)",
+  "var(--fg-cyan)",
+  "var(--fg-green)",
+  "var(--fg-yellow)",
+  "var(--fg-red)",
+  "var(--fg-violet)",
+  "var(--fg-cyan-700)",
+  "var(--fg-blue-700)",
 ];
 
 function ChartCard({ block }: { block: ChartBlock }) {
   const { spec, data } = block;
+  const chartRef = useRef<HTMLDivElement | null>(null);
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = chartRef.current;
+    if (!el) return;
+    const update = () => {
+      setChartSize({ width: el.clientWidth, height: el.clientHeight });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="rounded-xl border border-fg-grey-200 bg-white p-5">
       <div className="mb-3 flex items-center justify-between">
         <span className="font-display text-sm font-semibold text-fg-black">{spec.title}</span>
         <ChartTypeBadge type={spec.type} />
       </div>
-      <div className="h-72 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          {spec.type === "bar" ? (
-            <BarChart data={data} margin={{ top: 8, right: 12, left: 8, bottom: 32 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
+      <div ref={chartRef} className="h-72 w-full min-w-0">
+        {chartSize.width > 0 && chartSize.height > 0 && (
+          <>
+            {spec.type === "bar" ? (
+            <BarChart
+              data={data}
+              width={chartSize.width}
+              height={chartSize.height}
+              margin={{ top: 8, right: 12, left: 8, bottom: 32 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--fg-grey-200)" />
               <XAxis
                 dataKey={spec.xField}
-                tick={{ fontSize: 11, fill: "#52525B" }}
+                tick={{ fontSize: 11, fill: "var(--fg-grey-700)" }}
                 interval={0}
                 angle={-30}
                 textAnchor="end"
                 height={50}
               />
-              <YAxis tick={{ fontSize: 11, fill: "#52525B" }} tickFormatter={formatAxis} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--fg-grey-700)" }} tickFormatter={formatAxis} />
               <Tooltip content={<CustomTooltip yLabel={spec.title} />} />
               <Bar dataKey={spec.yField} radius={[4, 4, 0, 0]}>
                 {data.map((_, i) => (
@@ -180,10 +201,15 @@ function ChartCard({ block }: { block: ChartBlock }) {
               </Bar>
             </BarChart>
           ) : spec.type === "line" ? (
-            <LineChart data={pivotByGroup(data, spec)} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
-              <XAxis dataKey={spec.xField} tick={{ fontSize: 11, fill: "#52525B" }} />
-              <YAxis tick={{ fontSize: 11, fill: "#52525B" }} tickFormatter={formatAxis} />
+            <LineChart
+              data={pivotByGroup(data, spec)}
+              width={chartSize.width}
+              height={chartSize.height}
+              margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--fg-grey-200)" />
+              <XAxis dataKey={spec.xField} tick={{ fontSize: 11, fill: "var(--fg-grey-700)" }} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--fg-grey-700)" }} tickFormatter={formatAxis} />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               {groupKeys(data, spec).map((k, i) => (
@@ -199,27 +225,32 @@ function ChartCard({ block }: { block: ChartBlock }) {
               ))}
             </LineChart>
           ) : spec.type === "area" ? (
-            <AreaChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+            <AreaChart
+              data={data}
+              width={chartSize.width}
+              height={chartSize.height}
+              margin={{ top: 8, right: 16, left: 8, bottom: 8 }}
+            >
               <defs>
                 <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7C3AED" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#7C3AED" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="var(--fg-blue)" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="var(--fg-blue)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
-              <XAxis dataKey={spec.xField} tick={{ fontSize: 11, fill: "#52525B" }} />
-              <YAxis tick={{ fontSize: 11, fill: "#52525B" }} tickFormatter={formatAxis} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--fg-grey-200)" />
+              <XAxis dataKey={spec.xField} tick={{ fontSize: 11, fill: "var(--fg-grey-700)" }} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--fg-grey-700)" }} tickFormatter={formatAxis} />
               <Tooltip content={<CustomTooltip yLabel={spec.title} />} />
               <Area
                 type="monotone"
                 dataKey={spec.yField}
-                stroke="#7C3AED"
+                stroke="var(--fg-blue)"
                 strokeWidth={2}
                 fill="url(#areaFill)"
               />
             </AreaChart>
           ) : (
-            <PieChart>
+            <PieChart width={chartSize.width} height={chartSize.height}>
               <Pie
                 data={data}
                 dataKey={spec.yField}
@@ -246,8 +277,9 @@ function ChartCard({ block }: { block: ChartBlock }) {
                 wrapperStyle={{ fontSize: 12 }}
               />
             </PieChart>
-          )}
-        </ResponsiveContainer>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -261,7 +293,7 @@ function ChartTypeBadge({ type }: { type: ChartBlock["spec"]["type"] }) {
     area: "面积图",
   } as const;
   return (
-    <span className="rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-semibold text-fg-violet">
+    <span className="rounded-full bg-fg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-fg-blue-500">
       {map[type]}
     </span>
   );

@@ -11,3 +11,5 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 .gstack/
 .spec-workflow/
+docs/specs/
+umo-bridge/

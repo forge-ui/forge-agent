@@ -91,8 +91,8 @@ export function Button({
       className={cn(
         "px-5 py-2.5 rounded-xl font-semibold transition-colors",
         variant === "outline" &&
-          "border border-violet-600 text-violet-700 bg-white hover:bg-violet-50",
-        variant === "solid" && "bg-violet-600 text-white hover:bg-violet-700",
+          "border border-blue-600 text-blue-700 bg-white hover:bg-violet-50",
+        variant === "solid" && "bg-blue-600 text-white hover:bg-blue-700",
         variant === "ghost" && "text-zinc-500 hover:text-zinc-900",
         className,
       )}
@@ -122,8 +122,8 @@ export function Button({
       className={cn(
         "px-5 py-2.5 rounded-xl font-semibold transition-transform duration-200 hover:scale-105",
         variant === "outline" &&
-          "border border-violet-600 text-violet-700 bg-white hover:bg-violet-50",
-        variant === "solid" && "bg-violet-600 text-white hover:bg-violet-700",
+          "border border-blue-600 text-blue-700 bg-white hover:bg-violet-50",
+        variant === "solid" && "bg-blue-600 text-white hover:bg-blue-700",
         variant === "ghost" && "text-zinc-500 hover:text-zinc-900",
         className,
       )}
@@ -135,8 +135,8 @@ export function Button({
 
 const themeCode = `export const tokens = {
   color: {
-    "violet-600": "#7C3AED",
-    "violet-700": "#6D28D9",
+    "blue-600": "var(--fg-blue)",
+    "blue-700": "#6D28D9",
     "violet-50":  "#F5F3FF",
     "zinc-200":   "#E4E4E7",
     "zinc-500":   "#71717A",
@@ -153,8 +153,8 @@ const themeCode = `export const tokens = {
 
 function previewHtml({ outline, hoverScale }: { outline: boolean; hoverScale: boolean }): string {
   const baseClass = outline
-    ? "border border-violet-600 text-violet-700 bg-white hover:bg-violet-50"
-    : "bg-violet-600 text-white hover:bg-violet-700";
+    ? "border border-blue-600 text-blue-700 bg-white hover:bg-violet-50"
+    : "bg-blue-600 text-white hover:bg-blue-700";
   const hoverClass = hoverScale
     ? " hover:scale-105 transition-transform duration-200"
     : " transition-colors";
@@ -184,8 +184,8 @@ const tokenTable: DataTableArtifact = {
     { key: "count", label: "次数", type: "number" },
   ],
   rows: [
-    { token: "violet-600", value: "#7C3AED", category: "color", usedBy: "Button (outline border, solid bg)", count: 4 },
-    { token: "violet-700", value: "#6D28D9", category: "color", usedBy: "Button (outline text, solid hover)", count: 3 },
+    { token: "blue-600", value: "var(--fg-blue)", category: "color", usedBy: "Button (outline border, solid bg)", count: 4 },
+    { token: "blue-700", value: "#6D28D9", category: "color", usedBy: "Button (outline text, solid hover)", count: 3 },
     { token: "violet-50", value: "#F5F3FF", category: "color", usedBy: "Button (outline hover bg)", count: 1 },
     { token: "zinc-200", value: "#E4E4E7", category: "color", usedBy: "Button (secondary border)", count: 1 },
     { token: "zinc-500", value: "#71717A", category: "color", usedBy: "Button (ghost text)", count: 1 },
@@ -208,8 +208,8 @@ const buttonDiff: FileDiff = {
         { type: "delete", oldLine: 16, content: '        "px-5 py-2.5 rounded-xl font-semibold transition-colors",' },
         { type: "add", newLine: 16, content: '        "px-5 py-2.5 rounded-xl font-semibold transition-transform duration-200 hover:scale-105",' },
         { type: "context", oldLine: 17, newLine: 17, content: '        variant === "outline" &&' },
-        { type: "context", oldLine: 18, newLine: 18, content: '          "border border-violet-600 text-violet-700 bg-white hover:bg-violet-50",' },
-        { type: "context", oldLine: 19, newLine: 19, content: '        variant === "solid" && "bg-violet-600 text-white hover:bg-violet-700",' },
+        { type: "context", oldLine: 18, newLine: 18, content: '          "border border-blue-600 text-blue-700 bg-white hover:bg-violet-50",' },
+        { type: "context", oldLine: 19, newLine: 19, content: '        variant === "solid" && "bg-blue-600 text-white hover:bg-blue-700",' },
       ],
     },
   ],

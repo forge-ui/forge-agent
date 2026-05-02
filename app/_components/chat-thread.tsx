@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import {
   AltArrowRightLinear,
@@ -128,28 +129,28 @@ res.cookie("session", token, {
         id: "s1",
         title: "PR #234 · session 改造",
         hint: "github.com/forge-ui/forge",
-        favicon: "https://www.google.com/s2/favicons?sz=32&domain=github.com",
+        favicon: "/images/forge-logo.svg",
         excerpt: "把 session cookie 的 HttpOnly 默认值从 true 改成 false，理由是方便前端读取登录态。",
       },
       {
         id: "s2",
         title: "ESLint Report",
         hint: "ci-2026-04-27 · 3 errors",
-        favicon: "https://www.google.com/s2/favicons?sz=32&domain=eslint.org",
+        favicon: "/images/forge-logo.svg",
         excerpt: "session.ts:42 no-unsafe-cookie / list.ts:88 no-await-in-loop",
       },
       {
         id: "s3",
         title: "OWASP Top 10 — A01 Broken Auth",
         hint: "owasp.org",
-        favicon: "https://www.google.com/s2/favicons?sz=32&domain=owasp.org",
+        favicon: "/images/forge-logo.svg",
         excerpt: "Session tokens must not be accessible to client-side scripts. Use HttpOnly + Secure + SameSite.",
       },
       {
         id: "s4",
         title: "MDN · Set-Cookie HttpOnly",
         hint: "developer.mozilla.org",
-        favicon: "https://www.google.com/s2/favicons?sz=32&domain=mdn.io",
+        favicon: "/images/forge-logo.svg",
         excerpt: "When the HttpOnly attribute is set, the cookie cannot be accessed via document.cookie.",
       },
     ],
@@ -177,7 +178,7 @@ res.cookie("session", token, {
     content: "这是当前登录页截图，cookie 头有什么问题？",
     attachment: {
       kind: "image",
-      url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80",
+      url: "/images/screenshot.png",
       alt: "Login page screenshot",
     },
     time: "14:12",
@@ -189,10 +190,10 @@ res.cookie("session", token, {
     attachment: {
       kind: "image-grid",
       urls: [
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80",
-        "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=400&q=80",
-        "https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=400&q=80",
+        "/images/chart-card.png",
+        "/images/stat-card.png",
+        "/chat-hero-code-studio.png",
+        "/chat-hero-v2.png",
       ],
       extraCount: 6,
     },
@@ -200,16 +201,126 @@ res.cookie("session", token, {
   },
 ];
 
+const GENERAL_CHAT_PRESETS: Record<
+  string,
+  {
+    user: string;
+    assistant: string;
+    followUps?: string[];
+  }
+> = {
+  "g-1": {
+    user: "帮我把 Q2 OKR 整理成一版能发给团队的版本。",
+    assistant: `整理好了，建议拆成 **3 个目标 / 8 个关键结果**：
+
+1. **增长目标** — 新增 3 个高意向行业客户，销售线索转化率提升到 18%。
+2. **产品目标** — 完成 Agent 工作台 v1.2，上线 artifact 面板、会话切换、导出能力。
+3. **效率目标** — 把周会材料准备时间从 2 小时压到 30 分钟以内。
+
+我也把每个 KR 的负责人、验收口径、风险项补了一版，适合直接贴进飞书文档。`,
+    followUps: ["把 KR 改得更可量化", "补一版负责人分工", "压缩成老板能扫一眼的版本"],
+  },
+  "g-2": {
+    user: "把这份产品周会纪要改写得更清楚，别太口语。",
+    assistant: `可以，建议按 **结论 / 决策 / 行动项 / 风险** 重排：
+
+1. 本周确定保留右侧预览面板，但组件加载改为按需触发。
+2. 输入框固定在底部，消息列表独立滚动，避免切换会话时位置跳动。
+3. Word 编辑器先保留 Umo 方案，后续评估更轻量的富文本替代。
+
+行动项我会按负责人和截止时间单独列出，这样后续追踪更稳。`,
+    followUps: ["整理成表格", "变成会议邮件", "只保留行动项"],
+  },
+  "g-3": {
+    user: "帮我回一封拒绝邀约的邮件，语气礼貌一点。",
+    assistant: `可以这样写：
+
+感谢你的邀请，也很高兴看到这个项目的推进。不过我近期的排期已经比较满，暂时没有足够时间投入到这次合作里。
+
+这不是对项目本身的判断，只是现阶段精力分配确实不太允许。祝活动顺利，如果后续有更合适的时间窗口，我们可以再聊。`,
+    followUps: ["更正式一点", "更短一点", "加一点人情味"],
+  },
+  "g-4": {
+    user: "下周深圳出差怎么安排比较顺？",
+    assistant: `建议按区域排：
+
+1. **周二上午** 到南山，先见产品和研发相关客户。
+2. **周二下午** 留给福田，适合安排商务会和晚餐。
+3. **周三上午** 去前海，集中处理合作方拜访。
+4. **周三下午** 预留机动时间，避免跨区堵车导致后续全乱。
+
+酒店优先选南山和福田之间，通勤会更稳。`,
+    followUps: ["按高铁行程排", "加上餐厅建议", "做成两天日程表"],
+  },
+  "g-5": {
+    user: "讲讲 SQL window functions，别太教科书。",
+    assistant: `Window function 可以理解成：**不把行合并掉的聚合**。
+
+普通 \`GROUP BY\` 会把多行压成一行；窗口函数会保留每一行，同时让你看到“这一行在一组数据里的排名、累计值、前后邻居”。
+
+常见用法：
+
+1. \`row_number()\`：组内编号。
+2. \`rank()\`：组内排名。
+3. \`sum(amount) over (...)\`：累计销售额。
+4. \`lag()/lead()\`：看上一行/下一行。`,
+    followUps: ["给一个销售数据例子", "讲讲 partition by", "和 group by 对比"],
+  },
+  "g-6": {
+    user: "给老板写一封感谢信，别太谄媚。",
+    assistant: `可以写得克制一点：
+
+这段时间项目推进很快，感谢你在关键节点上帮团队明确优先级，也给了我们足够的空间把方案打磨完整。
+
+我自己也从这次协作里学到不少，尤其是如何在不确定的情况下先把核心问题收敛出来。后面我会继续把节奏和质量稳住。`,
+    followUps: ["更像微信消息", "更正式邮件版", "加一句团队视角"],
+  },
+  "g-7": {
+    user: "为啥 Q1 转化率掉了 8%？帮我列排查思路。",
+    assistant: `先别直接归因，建议拆成四层：
+
+1. **流量结构**：渠道占比有没有变，低意向流量是否增加。
+2. **线索质量**：新客画像、地区、行业是否偏离目标客户。
+3. **产品路径**：注册、试用、报价、支付每一步掉点在哪。
+4. **销售动作**：跟进时效、话术、报价策略有没有变化。
+
+先做漏斗分解，再看渠道和客户分层，通常能定位到 1-2 个主因。`,
+    followUps: ["给一张排查表", "转成 SQL 指标", "写成汇报口径"],
+  },
+};
+
+function getGeneralMessages(conversationId: string): Message[] {
+  const preset = GENERAL_CHAT_PRESETS[conversationId];
+  if (!preset) return MOCK_MESSAGES;
+  return [
+    {
+      role: "user",
+      id: `${conversationId}-u1`,
+      content: preset.user,
+      time: "14:02",
+    },
+    {
+      role: "assistant",
+      id: `${conversationId}-a1`,
+      markdown: preset.assistant,
+      followUps: preset.followUps,
+      time: "14:03",
+      latency: "1.1s",
+    },
+  ];
+}
+
 type Drawer =
   | { kind: "sources"; messageId: string }
   | { kind: "thinking"; messageId: string }
   | { kind: "tools"; messageId: string }
   | null;
 
-export function ChatThread() {
+export function ChatThread({ conversationId }: { conversationId: string }) {
   const [draft, setDraft] = useState("");
   const [mode, setMode] = useState<"think" | "search" | null>(null);
   const [drawer, setDrawer] = useState<Drawer>(null);
+  const messages = getGeneralMessages(conversationId);
 
   const pillActions: PillAction[] = [
     {
@@ -236,39 +347,37 @@ export function ChatThread() {
   ];
 
   const activeMessage = drawer
-    ? MOCK_MESSAGES.find((m) => m.role === "assistant" && m.id === drawer.messageId)
+    ? messages.find((m) => m.role === "assistant" && m.id === drawer.messageId)
     : null;
 
   return (
     <div className="relative flex h-[calc(100vh-4rem)] flex-col overflow-hidden">
-      <div className="flex flex-1 flex-col overflow-y-auto">
-        <main className="flex-1 px-4 py-8">
-          <div className="mx-auto flex w-full max-w-[820px] flex-col gap-8">
-            {MOCK_MESSAGES.map((m) =>
-              m.role === "user" ? (
-                <UserMessage key={m.id} message={m} />
-              ) : (
-                <AssistantMessage
-                  key={m.id}
-                  message={m}
-                  onOpenSources={() => setDrawer({ kind: "sources", messageId: m.id })}
-                  onOpenThinking={() => setDrawer({ kind: "thinking", messageId: m.id })}
-                  onOpenTools={() => setDrawer({ kind: "tools", messageId: m.id })}
-                />
-              ),
-            )}
-          </div>
-        </main>
-        <div className="sticky bottom-0 bg-gradient-to-t from-fg-grey-50 via-fg-grey-50/95 to-transparent px-4 pb-2 pt-4">
-          <div className="mx-auto w-full max-w-[820px]">
-            <ChatPillBar
-              placeholder="继续问点什么..."
-              value={draft}
-              onChange={setDraft}
-              onSend={() => setDraft("")}
-              actions={pillActions}
-            />
-          </div>
+      <main className="flex-1 overflow-y-auto px-4 pt-8 pb-44">
+        <div className="mx-auto flex w-full max-w-[820px] flex-col gap-8">
+          {messages.map((m) =>
+            m.role === "user" ? (
+              <UserMessage key={m.id} message={m} />
+            ) : (
+              <AssistantMessage
+                key={m.id}
+                message={m}
+                onOpenSources={() => setDrawer({ kind: "sources", messageId: m.id })}
+                onOpenThinking={() => setDrawer({ kind: "thinking", messageId: m.id })}
+                onOpenTools={() => setDrawer({ kind: "tools", messageId: m.id })}
+              />
+            ),
+          )}
+        </div>
+      </main>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-fg-grey-50 via-fg-grey-50/95 to-transparent px-4 pb-6 pt-10">
+        <div className="pointer-events-auto mx-auto w-full max-w-[820px]">
+          <ChatPillBar
+            placeholder="继续问点什么..."
+            value={draft}
+            onChange={setDraft}
+            onSend={() => setDraft("")}
+            actions={pillActions}
+          />
         </div>
       </div>
 
@@ -313,24 +422,24 @@ function UserMessage({
 function UserAttachmentBlock({ att }: { att: UserAttachment }) {
   if (att.kind === "voice") {
     return (
-      <div className="flex items-center gap-2.5 rounded-2xl bg-purple-100 px-3 py-2">
+      <div className="flex items-center gap-2.5 rounded-2xl bg-fg-blue-100 px-3 py-2">
         <button
           type="button"
           aria-label="播放语音"
-          className="flex size-7 items-center justify-center rounded-full bg-fg-violet text-white"
+          className="flex size-7 items-center justify-center rounded-full bg-fg-blue-500 text-white"
         >
-          <PlayBoldDuotone size={16} color="#fff" />
+          <PlayBoldDuotone size={16} color="var(--fg-grey-50)" />
         </button>
         <div className="flex items-end gap-0.5">
           {[3, 5, 8, 6, 4, 7, 9, 5, 3, 6, 8, 4, 5, 7, 4, 3].map((h, i) => (
             <span
               key={i}
-              className="block w-0.5 rounded-full bg-fg-violet/70"
+              className="block w-0.5 rounded-full bg-fg-blue-500/70"
               style={{ height: `${h * 2}px` }}
             />
           ))}
         </div>
-        <span className="text-xs font-medium tabular-nums text-fg-violet">{att.duration}</span>
+        <span className="text-xs font-medium tabular-nums text-fg-blue-500">{att.duration}</span>
       </div>
     );
   }
@@ -353,7 +462,15 @@ function UserAttachmentBlock({ att }: { att: UserAttachment }) {
         aria-label={att.alt}
         className="overflow-hidden rounded-2xl"
       >
-        <img src={att.url} alt={att.alt} className="h-44 w-auto object-cover" />
+        <span className="relative block h-44 w-72">
+          <Image
+            src={att.url}
+            alt={att.alt}
+            fill
+            sizes="288px"
+            className="object-cover"
+          />
+        </span>
       </button>
     );
   }
@@ -371,9 +488,15 @@ function UserAttachmentBlock({ att }: { att: UserAttachment }) {
               type="button"
               className="relative h-24 w-32 overflow-hidden rounded-xl"
             >
-              <img src={url} alt="" className="h-full w-full object-cover" />
+              <Image
+                src={url}
+                alt=""
+                fill
+                sizes="128px"
+                className="object-cover"
+              />
               {showOverlay && (
-                <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-sm font-semibold text-white">
+                <span className="absolute inset-0 flex items-center justify-center bg-fg-black/55 text-sm font-semibold text-fg-grey-50">
                   +{extra}
                 </span>
               )}
@@ -424,7 +547,7 @@ function ThinkingLine({ duration, onOpen }: { duration: string; onOpen: () => vo
       onClick={onOpen}
       className="flex items-center gap-1.5 self-start text-sm text-fg-grey-700 transition hover:text-fg-grey-900"
     >
-      <LightbulbBoldDuotone size={15} color="#A78BFA" />
+      <LightbulbBoldDuotone size={15} color="var(--fg-blue)" />
       <span>思考了 {duration}</span>
       <AltArrowRightLinear size={12} color="currentColor" />
     </button>
@@ -438,7 +561,7 @@ function ToolCallLine({ steps, onOpen }: { steps: ToolStep[]; onOpen: () => void
       onClick={onOpen}
       className="flex items-center gap-1.5 self-start text-sm text-fg-grey-700 transition hover:text-fg-grey-900"
     >
-      <CodeSquareLinear size={15} color="#7C3AED" />
+      <CodeSquareLinear size={15} color="var(--fg-blue)" />
       <span>调用了 {steps.length} 个工具</span>
       <AltArrowRightLinear size={12} color="currentColor" />
     </button>
@@ -454,7 +577,7 @@ function ToolCallDrawer({
 }) {
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-fg-black/20" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-50 flex h-full w-[420px] flex-col bg-white shadow-2xl">
         <header className="flex items-center justify-between border-b border-fg-grey-200 px-5 py-4">
           <div className="flex flex-col">
@@ -480,11 +603,11 @@ function ToolCallDrawer({
               <li key={s.id} className="flex gap-3">
                 <div className="flex flex-col items-center pt-0.5">
                   {s.status === "ok" ? (
-                    <CheckSquareBoldDuotone size={18} color="#059669" />
+                    <CheckSquareBoldDuotone size={18} color="var(--fg-green-600)" />
                   ) : s.status === "warn" ? (
-                    <ShieldCheckBoldDuotone size={18} color="#D97706" />
+                    <ShieldCheckBoldDuotone size={18} color="var(--fg-yellow-600)" />
                   ) : (
-                    <CloseSquareBoldDuotone size={18} color="#E11D48" />
+                    <CloseSquareBoldDuotone size={18} color="var(--fg-red-600)" />
                   )}
                   {i < steps.length - 1 && (
                     <span className="mt-1 w-px flex-1 bg-fg-grey-200" />
@@ -518,7 +641,7 @@ function SourcesDrawer({
   return (
     <>
       {/* backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/20 transition" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-fg-black/20 transition" onClick={onClose} />
       {/* drawer */}
       <aside className="fixed right-0 top-0 z-50 flex h-full w-[420px] flex-col bg-white shadow-2xl">
         <header className="flex items-center justify-between border-b border-fg-grey-200 px-5 py-4">
@@ -544,13 +667,13 @@ function SourcesDrawer({
             {sources.map((s, i) => (
               <li
                 key={s.id}
-                className="rounded-xl border border-fg-grey-200 bg-white p-4 transition hover:border-fg-violet"
+                className="rounded-xl border border-fg-grey-200 bg-white p-4 transition hover:border-fg-blue-500"
               >
                 <div className="flex items-center gap-2 text-xs text-fg-grey-700">
                   <span className="flex size-5 items-center justify-center rounded-full bg-fg-grey-100 text-[11px] font-semibold text-fg-grey-900">
                     {i + 1}
                   </span>
-                  <img src={s.favicon} alt="" className="size-4 rounded-full" />
+                  <Image src={s.favicon} alt="" width={16} height={16} className="size-4 rounded-full" />
                   <span className="truncate">{s.hint}</span>
                 </div>
                 <h3 className="mt-2 text-sm font-semibold leading-snug text-fg-black">
@@ -564,7 +687,7 @@ function SourcesDrawer({
                 <div className="mt-3 flex">
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 text-xs font-medium text-fg-violet hover:underline"
+                    className="flex items-center gap-1.5 text-xs font-medium text-fg-blue-500 hover:underline"
                   >
                     <LinkLinear size={12} color="currentColor" />
                     查看原文
@@ -590,7 +713,7 @@ function ThinkingDrawer({
 }) {
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-fg-black/20" onClick={onClose} />
       <aside className="fixed right-0 top-0 z-50 flex h-full w-[420px] flex-col bg-white shadow-2xl">
         <header className="flex items-center justify-between border-b border-fg-grey-200 px-5 py-4">
           <div className="flex flex-col">
@@ -615,7 +738,7 @@ function ThinkingDrawer({
             {steps.map((s, i) => (
               <li key={i} className="flex gap-3">
                 <div className="flex flex-col items-center pt-0.5">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-purple-100 text-xs font-semibold text-fg-violet">
+                  <span className="flex size-6 items-center justify-center rounded-full bg-fg-blue-100 text-xs font-semibold text-fg-blue-500">
                     {i + 1}
                   </span>
                   {i < steps.length - 1 && (
@@ -638,4 +761,3 @@ function ThinkingDrawer({
 // ============================================================
 // 极简 markdown 解析（demo 用）
 // ============================================================
-

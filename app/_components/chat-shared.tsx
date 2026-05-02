@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { ArrowLeftDownLinear, CopyLinear, RefreshLinear } from "solar-icon-set";
 
 export type ChatSource = {
@@ -57,14 +58,16 @@ export function MessageActions({
         <button
           type="button"
           onClick={onOpenSources}
-          className="ml-auto flex items-center gap-2 rounded-full border border-fg-grey-200 bg-white px-2.5 py-1 text-xs font-medium text-fg-grey-900 transition hover:border-fg-violet"
+          className="ml-auto flex items-center gap-2 rounded-full border border-fg-grey-200 bg-white px-2.5 py-1 text-xs font-medium text-fg-grey-900 transition hover:border-fg-blue-500"
         >
           <span className="flex -space-x-1.5">
             {sources.slice(0, 3).map((s) => (
-              <img
+              <Image
                 key={s.id}
                 src={s.favicon}
                 alt=""
+                width={16}
+                height={16}
                 className="size-4 rounded-full ring-2 ring-white"
               />
             ))}
@@ -102,11 +105,11 @@ export function FollowUps({
           key={i}
           type="button"
           onClick={() => onPick?.(q)}
-          className={`flex items-center gap-2 py-2 text-left text-sm text-fg-grey-900 transition hover:text-fg-violet ${
+          className={`flex items-center gap-2 py-2 text-left text-sm text-fg-grey-900 transition hover:text-fg-blue-500 ${
             i > 0 ? "border-t border-fg-grey-100" : ""
           }`}
         >
-          <ArrowLeftDownLinear size={14} color="#A1A1AA" />
+          <ArrowLeftDownLinear size={14} color="var(--fg-grey-500)" />
           <span>{q}</span>
         </button>
       ))}

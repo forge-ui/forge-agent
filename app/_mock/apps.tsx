@@ -39,7 +39,7 @@ export const apps: ForgeApp[] = [
     tagline: "邮件 / 计划 / 查资料，什么都聊",
     description: "你的全能助理，不挑场景。",
     icon: ChatRoundDotsBoldDuotone,
-    accent: "purple",
+    accent: "blue",
     heroIllustration: "/chat-mascot.png",
     suggestions: [
       { title: "帮我写一份周报", body: "贴本周做的事，输出结构化周报。" },
@@ -73,13 +73,13 @@ export const apps: ForgeApp[] = [
       { title: "排查这个 Bug", body: "贴报错和最小复现，给修复方案。" },
     ],
     conversations: [
-      { id: "c-1", title: "改下登录页样式", group: "today" },
-      { id: "c-2", title: "PR #234 review", group: "today" },
-      { id: "c-3", title: "Tailwind v4 @source 解释", group: "today" },
-      { id: "c-4", title: "重构 user-service hooks", group: "earlier" },
-      { id: "c-5", title: "修 vitest mock fetch 的报错", group: "earlier" },
-      { id: "c-6", title: "Migration 失败排查", group: "earlier" },
-      { id: "c-7", title: "Server Component 不能用 useState?", group: "earlier" },
+      { id: "c-1", title: "销售日报生成", group: "today" },
+      { id: "c-2", title: "Top 客户 SQL 优化", group: "today" },
+      { id: "c-3", title: "数据流图和脑图", group: "today" },
+      { id: "c-4", title: "白板架构草图", group: "earlier" },
+      { id: "c-5", title: "PDF / 网页预览", group: "earlier" },
+      { id: "c-6", title: "Excel 工作簿导出", group: "earlier" },
+      { id: "c-7", title: "周报文档和 PPT", group: "earlier" },
     ],
   },
 ];
@@ -93,15 +93,15 @@ export function getAppBySlug(slug: string | undefined): ForgeApp | undefined {
 
 // accent → tailwind 配色（icon 容器用）
 export const accentBg: Record<AppAccent, string> = {
-  purple: "bg-purple-100",
-  blue: "bg-indigo-100",
-  emerald: "bg-emerald-100",
-  amber: "bg-amber-100",
+  purple: "bg-fg-violet-100",
+  blue: "bg-fg-blue-100",
+  emerald: "bg-fg-green-100",
+  amber: "bg-fg-yellow-100",
 };
 
 export const accentIconColor: Record<AppAccent, string> = {
-  purple: "#7C3AED",
-  blue: "#2563EB",
-  emerald: "#059669",
-  amber: "#D97706",
+  purple: "var(--fg-violet)",
+  blue: "var(--fg-blue)",
+  emerald: "var(--fg-green)",
+  amber: "var(--fg-yellow)",
 };

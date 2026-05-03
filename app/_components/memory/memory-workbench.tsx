@@ -1,9 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
   Button,
-  ProgressBar,
   StatusBadge,
   TabBar,
 } from "@forge-ui/react";
@@ -29,7 +29,7 @@ import {
 import { activeMemories, memoryCandidates } from "@/lib/memory/mock";
 import type { MemoryAsset, MemoryAssetType } from "@/lib/memory/types";
 
-type WorkbenchTab = "today" | "assets" | "evidence";
+type WorkbenchTab = "pending" | "settled" | "evidence";
 
 const TYPE_META: Record<
   MemoryAssetType,
@@ -86,14 +86,10 @@ const TONE_CLASS = {
 } as const;
 
 export function MemoryWorkbench() {
-  const [activeTab, setActiveTab] = useState<WorkbenchTab>("today");
+  const [activeTab, setActiveTab] = useState<WorkbenchTab>("pending");
   const [candidates, setCandidates] = useState(memoryCandidates);
   const [selected, setSelected] = useState<MemoryAsset | null>(null);
 
-  const acceptedCount = useMemo(
-    () => candidates.filter((item) => item.status === "active").length,
-    [candidates],
-  );
   const pendingCandidates = candidates.filter((item) => item.status === "candidate");
   const allActive = [...activeMemories, ...candidates.filter((item) => item.status === "active")];
 
@@ -105,88 +101,50 @@ export function MemoryWorkbench() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-11rem)] bg-fg-grey-50 px-4 pb-8 pt-1">
-      <div className="mx-auto flex w-full max-w-[1360px] flex-col gap-5">
-        <section className="rounded-lg border border-fg-grey-200 bg-fg-white px-5 py-4">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex min-w-0 items-start gap-3">
-              <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-fg-blue-50">
-                <CommandBoldDuotone size={18} color="var(--fg-blue-500)" />
-              </span>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="font-display text-xl font-bold tracking-fg text-fg-black">
-                    Forge Memory
-                  </h1>
-                  <StatusBadge label="需确认" color="yellow" />
-                  <span className="text-xs font-medium text-fg-grey-700">
-                    从 1 段产品讨论识别到 4 条候选资产
-                  </span>
-                </div>
-                <p className="mt-1 text-sm leading-6 text-fg-grey-700">
-                  确认偏好、决策、技能和规则；后续 Agent 会按这些工作方式执行。
-                </p>
-              </div>
-            </div>
+    <div className="flex h-[calc(100vh-8rem)] min-h-0 flex-col overflow-hidden bg-fg-grey-50 px-4 pb-4 pt-1">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-[1360px] flex-col gap-5">
+        <MemoryBanner />
 
-            <div className="grid shrink-0 gap-2 sm:grid-cols-3 xl:w-[420px]">
-              <CompactMetric label="待确认" value={`${pendingCandidates.length}`} />
-              <CompactMetric label="已启用" value={`${allActive.length}`} />
-              <CompactMetric label="本次命中" value="3" />
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-2 lg:grid-cols-[1fr_1fr_1fr_1.5fr]">
-            <SignalRow
-              label="用户偏好"
-              value="94%"
-              icon={<StarShineBoldDuotone size={16} color="var(--fg-blue-500)" />}
-            />
-            <SignalRow
-              label="产品决策"
-              value="89%"
-              icon={<ArchiveCheckBoldDuotone size={16} color="var(--fg-violet)" />}
-            />
-            <SignalRow
-              label="可复用技能"
-              value="86%"
-              icon={<BoltBoldDuotone size={16} color="var(--fg-green-500)" />}
-            />
-            <div className="flex items-start gap-2 rounded-lg border border-fg-blue-100 bg-fg-blue-50 px-3 py-2.5">
-              <CheckCircleBoldDuotone size={16} color="var(--fg-blue-500)" />
-              <p className="text-xs leading-5 text-fg-grey-900">
-                原型重点：聊天后 10 秒确认工作记忆，而不是维护复杂知识库。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <div className="flex flex-col gap-4 rounded-lg border border-fg-grey-200 bg-fg-white p-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden rounded-lg border border-fg-grey-200 bg-fg-white p-4">
           <TabBar
             color="blue"
             surface="inline"
             tabs={[
-              { label: "今日沉淀", active: activeTab === "today", badge: pendingCandidates.length },
-              { label: "工作方式", active: activeTab === "assets", badge: allActive.length },
+              { label: "待确认", active: activeTab === "pending", badge: pendingCandidates.length },
+              { label: "已沉淀", active: activeTab === "settled", badge: allActive.length },
               { label: "证据链", active: activeTab === "evidence" },
             ]}
-            onChange={(index) => setActiveTab(["today", "assets", "evidence"][index] as WorkbenchTab)}
+            onChange={(index) => setActiveTab(["pending", "settled", "evidence"][index] as WorkbenchTab)}
           />
 
-          {activeTab === "today" ? (
-            <TodayView
-              candidates={candidates}
-              selected={selected}
-              acceptedCount={acceptedCount}
-              onSelect={setSelected}
-              onAccept={(asset) => updateStatus(asset, "active")}
-              onIgnore={(asset) => updateStatus(asset, "ignored")}
-            />
-          ) : activeTab === "assets" ? (
-            <AssetsView assets={allActive} onSelect={setSelected} />
-          ) : (
-            <EvidenceView assets={[...candidates, ...activeMemories]} onSelect={setSelected} />
-          )}
+          <div className="flex flex-col gap-2 rounded-lg bg-fg-grey-50 px-4 py-3 md:flex-row md:items-center md:justify-between">
+            <p className="text-sm leading-6 text-fg-grey-900">
+              {activeTab === "pending"
+                ? `今天从 1 段对话中沉淀 ${pendingCandidates.length} 条候选：偏好、决策、技能、规则。`
+                : activeTab === "settled"
+                  ? `${allActive.length} 条已沉淀资产正在影响后续 Agent：偏好、技能、规则。`
+                  : "每条工作记忆都能回到原始对话、文件或人工确认记录。"}
+            </p>
+            <span className="text-xs font-medium text-fg-grey-700">
+              {activeTab === "pending" ? "收下后才会生效" : "可随时修改、暂停或归档"}
+            </span>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+            {activeTab === "pending" ? (
+              <TodayView
+                candidates={pendingCandidates}
+                selected={selected}
+                onSelect={setSelected}
+                onAccept={(asset) => updateStatus(asset, "active")}
+                onIgnore={(asset) => updateStatus(asset, "ignored")}
+              />
+            ) : activeTab === "settled" ? (
+              <AssetsView assets={allActive} onSelect={setSelected} />
+            ) : (
+              <EvidenceView assets={[...candidates, ...activeMemories]} onSelect={setSelected} />
+            )}
+          </div>
         </div>
       </div>
 
@@ -195,26 +153,59 @@ export function MemoryWorkbench() {
   );
 }
 
+function MemoryBanner() {
+  return (
+    <section className="relative min-h-[250px] overflow-hidden rounded-lg border border-fg-grey-200 bg-fg-white">
+      <Image
+        src="/images/memory-banner-bg.png"
+        alt=""
+        fill
+        priority
+        sizes="1200px"
+        className="object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--fg-white)_0%,var(--fg-white)_30%,rgba(255,255,255,0.86)_44%,rgba(255,255,255,0.32)_60%,rgba(255,255,255,0)_100%)]" />
+      <div className="relative z-10 flex min-h-[250px] max-w-[620px] flex-col justify-center px-6 py-6">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-fg-blue-500">
+          <CommandBoldDuotone size={16} color="var(--fg-blue-500)" />
+          Forge Memory
+        </div>
+        <h2 className="mt-3 font-display text-2xl font-bold tracking-fg text-fg-black">
+          让每次协作沉淀成工作记忆
+        </h2>
+        <p className="mt-2 max-w-[520px] text-sm leading-6 text-fg-grey-700">
+          从聊天中提炼偏好、技能和规则，让 Agent 按你的方式工作。
+        </p>
+        <button
+          type="button"
+          className="mt-4 flex w-fit items-center gap-1.5 text-sm font-semibold text-fg-blue-500 transition hover:text-fg-blue-700"
+        >
+          了解机制
+          <AltArrowRightLinear size={14} color="currentColor" />
+        </button>
+      </div>
+    </section>
+  );
+}
+
 function TodayView({
   candidates,
   selected,
-  acceptedCount,
   onSelect,
   onAccept,
   onIgnore,
 }: {
   candidates: MemoryAsset[];
   selected: MemoryAsset | null;
-  acceptedCount: number;
   onSelect: (asset: MemoryAsset) => void;
   onAccept: (asset: MemoryAsset) => void;
   onIgnore: (asset: MemoryAsset) => void;
 }) {
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="overflow-hidden rounded-lg border border-fg-grey-200 bg-fg-white">
         {candidates.map((asset) => (
-          <MemoryAssetCard
+          <MemoryInboxRow
             key={asset.id}
             asset={asset}
             selected={selected?.id === asset.id}
@@ -234,20 +225,13 @@ function TodayView({
         <div className="rounded-lg border border-fg-grey-200 bg-fg-white p-4">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-fg-grey-700">
             <RefreshLinear size={14} color="var(--fg-grey-700)" />
-            模拟对话注入
+            将应用
           </div>
-          <p className="mt-3 text-sm leading-6 text-fg-black">
-            用户说：“帮我把工作记忆页面做成高保真原型。”
-          </p>
           <div className="mt-4 flex flex-col gap-2">
             <AppliedMemory label="中文输出偏好" />
             <AppliedMemory label="Forge UI 开发规则" />
-            <AppliedMemory label="产品设计评估技能" muted={acceptedCount === 0} />
+            <AppliedMemory label="产品设计评估技能" muted />
           </div>
-        </div>
-        <div className="rounded-lg border border-fg-grey-200 bg-fg-white p-4">
-          <h4 className="text-sm font-semibold text-fg-black">确认成本</h4>
-          <ProgressBar value={68} color="blue" size="sm" label="4 条候选中 3 条可一键收下" />
         </div>
       </aside>
     </div>
@@ -285,12 +269,24 @@ function AssetsView({
                     className="rounded-lg border border-fg-grey-200 bg-fg-white p-4 text-left transition hover:border-fg-blue-500"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h4 className="text-sm font-semibold leading-5 text-fg-black">{asset.title}</h4>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="text-sm font-semibold leading-5 text-fg-black">{asset.title}</h4>
+                          <StatusBadge label="启用中" color="green" />
+                        </div>
+                      </div>
                       <AltArrowRightLinear size={14} color="var(--fg-grey-700)" />
                     </div>
                     <p className="mt-2 line-clamp-2 text-xs leading-5 text-fg-grey-700">
                       {asset.content}
                     </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-fg-grey-100 pt-3">
+                      <span className="text-xs font-medium text-fg-blue-500">查看</span>
+                      <span className="text-xs text-fg-grey-400">·</span>
+                      <span className="text-xs font-medium text-fg-grey-700">修改</span>
+                      <span className="text-xs text-fg-grey-400">·</span>
+                      <span className="text-xs font-medium text-fg-grey-700">暂停</span>
+                    </div>
                   </button>
                 ))
               ) : (
@@ -346,7 +342,7 @@ function EvidenceView({
   );
 }
 
-function MemoryAssetCard({
+function MemoryInboxRow({
   asset,
   selected,
   onSelect,
@@ -360,89 +356,61 @@ function MemoryAssetCard({
   onIgnore: () => void;
 }) {
   const meta = TYPE_META[asset.type];
-  const isActive = asset.status === "active";
-  const isIgnored = asset.status === "ignored";
 
   return (
-    <article
+    <div
       className={
         selected
-          ? "flex min-h-[270px] flex-col justify-between rounded-lg border border-fg-blue-500 bg-fg-white p-4 shadow-sm"
-          : "flex min-h-[270px] flex-col justify-between rounded-lg border border-fg-grey-200 bg-fg-white p-4 transition hover:border-fg-blue-500"
+          ? "grid gap-3 border-b border-fg-blue-100 bg-fg-blue-50/40 p-4 last:border-b-0 lg:grid-cols-[96px_minmax(0,1fr)_64px_188px]"
+          : "grid gap-3 border-b border-fg-grey-100 bg-fg-white p-4 transition last:border-b-0 hover:bg-fg-grey-50 lg:grid-cols-[96px_minmax(0,1fr)_64px_188px]"
       }
     >
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs font-semibold ${
-              TONE_CLASS[meta.tone]
-            }`}
-          >
-            {meta.icon}
-            {meta.label}
-          </span>
-          {isActive ? (
-            <StatusBadge label="已收下" color="green" />
-          ) : isIgnored ? (
-            <StatusBadge label="已忽略" color="grey" />
-          ) : (
-            <StatusBadge label={`${Math.round(asset.confidence * 100)}%`} color="blue" />
-          )}
-        </div>
-
-        <button type="button" onClick={onSelect} className="text-left">
-          <h3 className="text-base font-semibold leading-6 text-fg-black">{asset.title}</h3>
-          <p className="mt-2 line-clamp-3 text-sm leading-6 text-fg-grey-700">{asset.content}</p>
-        </button>
+      <div className="flex items-start">
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs font-semibold ${
+            TONE_CLASS[meta.tone]
+          }`}
+        >
+          {meta.icon}
+          {meta.label}
+        </span>
       </div>
-
-      <div className="mt-5 flex flex-col gap-3">
-        <div className="flex flex-wrap gap-1.5">
-          {asset.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded bg-fg-grey-100 px-2 py-1 text-[11px] font-medium text-fg-grey-900"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className="flex items-center justify-between gap-3 border-t border-fg-grey-100 pt-3">
+      <button type="button" onClick={onSelect} className="min-w-0 text-left">
+        <h3 className="truncate text-sm font-semibold text-fg-black">{asset.title}</h3>
+        <p className="mt-1 line-clamp-1 text-xs leading-5 text-fg-grey-700">{asset.content}</p>
+      </button>
+      <div className="flex items-start lg:justify-end">
+        <span className="rounded-full bg-fg-blue-500 px-2 py-1 text-xs font-semibold text-fg-white">
+          {Math.round(asset.confidence * 100)}%
+        </span>
+      </div>
+      <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+        <Button
+          type="button"
+          color="blue"
+          variant="primary"
+          size="sm"
+          iconLeft={<CheckCircleBoldDuotone size={14} color="currentColor" />}
+          onClick={onAccept}
+        >
+          收下
+        </Button>
           <button
             type="button"
             onClick={onSelect}
-            className="flex items-center gap-1.5 text-xs font-medium text-fg-grey-700 transition hover:text-fg-blue-500"
+          className="text-xs font-medium text-fg-blue-500 transition hover:text-fg-blue-700"
           >
-            <LinkLinear size={13} color="currentColor" />
             证据
           </button>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              color="grey"
-              variant="secondary"
-              size="sm"
-              iconLeft={<CloseCircleBoldDuotone size={14} color="currentColor" />}
-              disabled={isIgnored}
-              onClick={onIgnore}
-            >
-              忽略
-            </Button>
-            <Button
-              type="button"
-              color="blue"
-              variant="primary"
-              size="sm"
-              iconLeft={<CheckCircleBoldDuotone size={14} color="currentColor" />}
-              disabled={isActive}
-              onClick={onAccept}
-            >
-              收下
-            </Button>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={onIgnore}
+          className="text-xs font-medium text-fg-grey-700 transition hover:text-fg-grey-900"
+        >
+          忽略
+        </button>
       </div>
-    </article>
+    </div>
   );
 }
 
@@ -575,41 +543,6 @@ function RuleList({ title, items }: { title: string; items: string[] }) {
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-function CompactMetric({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-fg-grey-200 bg-fg-grey-50 px-3 py-2.5">
-      <p className="text-xs font-semibold text-fg-grey-700">{label}</p>
-      <span className="font-display text-2xl font-bold text-fg-black">{value}</span>
-    </div>
-  );
-}
-
-function SignalRow({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-fg-grey-200 bg-fg-grey-50 px-3 py-2.5">
-      <div className="flex items-center gap-2 text-sm font-medium text-fg-grey-900">
-        {icon}
-        {label}
-      </div>
-      <span className="text-xs font-semibold text-fg-grey-700">{value}</span>
     </div>
   );
 }

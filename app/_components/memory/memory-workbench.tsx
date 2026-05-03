@@ -161,6 +161,7 @@ function MemoryBanner() {
         alt=""
         fill
         priority
+        unoptimized
         sizes="1200px"
         className="object-cover object-center"
       />

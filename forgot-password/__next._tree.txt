@@ -1,5 +1,5 @@
-:HL["/_next/static/chunks/0w1k01w9.~5u3.css","style"]
+:HL["/_next/static/chunks/0o-qs3rhp3vdr.css","style"]
 :HL["/images/hero.jpg","image"]
 :HL["/images/chart-card.png","image"]
 :HL["/images/stat-card.png","image"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"(auth)","param":null,"prefetchHints":0,"slots":{"children":{"name":"forgot-password","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"H2m9aNe2ZqVsX09DTtOO_"}
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"(auth)","param":null,"prefetchHints":0,"slots":{"children":{"name":"forgot-password","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"7UkQB7u4DKdlG1b95rEZf"}

@@ -24,8 +24,7 @@ import type { ArtifactRenderProps } from "@/app/_artifacts/types";
 
 const CONFIGURED_UMO_BASE_URL = process.env.NEXT_PUBLIC_UMO_ORIGIN?.replace(/\/$/, "");
 const DEV_UMO_BASE_URL = process.env.NODE_ENV === "development" ? "http://127.0.0.1:3456" : "";
-const CDN_UMO_BASE_URL = "https://cdn.jsdelivr.net/gh/forge-ui/forge-agent@gh-pages";
-const UMO_BASE_URL = CONFIGURED_UMO_BASE_URL || DEV_UMO_BASE_URL || CDN_UMO_BASE_URL;
+const UMO_BASE_URL = CONFIGURED_UMO_BASE_URL || DEV_UMO_BASE_URL || "";
 const UMO_SRC = `${UMO_BASE_URL}/umo/index.html`;
 const UMO_TARGET_ORIGIN = (() => {
   try {
@@ -39,8 +38,9 @@ export default function DocumentRender({ payload, readOnly, onChange }: Artifact
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const iframeReadyRef = useRef(false);
   const seqRef = useRef(0);
-  const isUnsafeSameOrigin =
-    typeof window !== "undefined" && UMO_TARGET_ORIGIN === window.location.origin;
+  const shouldUseOpaqueSandbox = !CONFIGURED_UMO_BASE_URL && process.env.NODE_ENV !== "development";
+  const targetOrigin = shouldUseOpaqueSandbox ? "*" : UMO_TARGET_ORIGIN;
+  const acceptedIframeOrigin = shouldUseOpaqueSandbox ? "null" : UMO_TARGET_ORIGIN;
 
   // listener 闭包始终拿最新 props，但 useEffect 只注册一次（避免每次输入字符 add/remove）
   const stateRef = useRef({ payload, readOnly, onChange });
@@ -60,7 +60,7 @@ export default function DocumentRender({ payload, readOnly, onChange }: Artifact
       readOnly: ro ?? false,
     };
     try {
-      win.postMessage(msg, UMO_TARGET_ORIGIN);
+      win.postMessage(msg, targetOrigin);
     } catch (err) {
       console.warn("[document-bridge] postMessage to iframe failed:", err);
     }
@@ -74,7 +74,7 @@ export default function DocumentRender({ payload, readOnly, onChange }: Artifact
   useEffect(() => {
     function handler(e: MessageEvent) {
       if (e.source !== iframeRef.current?.contentWindow) return;
-      if (e.origin !== UMO_TARGET_ORIGIN) return;
+      if (e.origin !== acceptedIframeOrigin) return;
       const data = e.data as Partial<IframeToParentMessage> | null;
       if (!data || typeof data !== "object" || !isBridgeKind(data.kind)) return;
 
@@ -99,7 +99,7 @@ export default function DocumentRender({ payload, readOnly, onChange }: Artifact
     sendInit();
   }
 
-  if (!UMO_SRC || isUnsafeSameOrigin) {
+  if (!UMO_SRC) {
     return <DocumentBridgeUnavailable />;
   }
 
@@ -110,7 +110,11 @@ export default function DocumentRender({ payload, readOnly, onChange }: Artifact
         src={UMO_SRC}
         title="Umo Editor"
         onLoad={onIframeLoad}
-        sandbox="allow-scripts allow-same-origin allow-forms"
+        sandbox={
+          shouldUseOpaqueSandbox
+            ? "allow-scripts allow-forms"
+            : "allow-scripts allow-same-origin allow-forms"
+        }
         className="h-full w-full border-0 bg-fg-white"
       />
     </div>

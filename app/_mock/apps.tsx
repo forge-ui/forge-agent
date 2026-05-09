@@ -84,7 +84,7 @@ export const apps: ForgeApp[] = [
   },
 ];
 
-export const DEFAULT_APP_SLUG = apps[0].slug;
+export const DEFAULT_APP_SLUG = "coding";
 
 export function getAppBySlug(slug: string | undefined): ForgeApp | undefined {
   if (!slug) return undefined;

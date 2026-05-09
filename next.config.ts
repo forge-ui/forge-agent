@@ -5,7 +5,16 @@ import type { NextConfig } from "next";
 // 仍保留 NEXT_PUBLIC_BASE_PATH 占位以便 lib/asset.ts 兼容。
 const isGhPages = process.env.GITHUB_PAGES === "true";
 const isProd = process.env.NODE_ENV === "production";
-const umoOrigin = process.env.NEXT_PUBLIC_UMO_ORIGIN?.replace(/\/$/, "");
+const defaultUmoOrigin = "https://cdn.jsdelivr.net";
+const configuredUmoBaseUrl = process.env.NEXT_PUBLIC_UMO_ORIGIN?.replace(/\/$/, "");
+const umoOrigin = (() => {
+  if (!configuredUmoBaseUrl) return defaultUmoOrigin;
+  try {
+    return new URL(configuredUmoBaseUrl).origin;
+  } catch {
+    return configuredUmoBaseUrl;
+  }
+})();
 
 const contentSecurityPolicy = [
   "default-src 'self'",

@@ -15,7 +15,7 @@
 import { useMemo, useState } from "react";
 import {
   CloseIcon,
-} from "@forge-ui/react";
+} from "@forge-ui-official/core";
 import {
   AltArrowDownLinear,
   DownloadLinear,

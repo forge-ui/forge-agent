@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, usePathname, useSearchParams } from "next/navigation";
-import { PlusIcon } from "@forge-ui/react";
+import { PlusIcon } from "@forge-ui-official/core";
 import {
   ChatRoundLineLinear,
   LibraryBoldDuotone,

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatInputBar, type ChatInputBarToggle } from "@forge-ui/react";
+import { ChatInputBar, type ChatInputBarToggle } from "@forge-ui-official/core";
 
 export type PillAction = {
   id: string;

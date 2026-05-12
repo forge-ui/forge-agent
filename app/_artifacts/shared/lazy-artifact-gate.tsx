@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Button, type ButtonColor } from "@forge-ui/react";
+import { Button, type ButtonColor } from "@forge-ui-official/core";
 
 type LazyArtifactGateProps = {
   title: string;

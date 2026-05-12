@@ -6,7 +6,7 @@ import {
   AppLayout,
   type AppLayoutBreadcrumb,
   type AppLayoutPageHeaderVariant,
-} from "@forge-ui/react";
+} from "@forge-ui-official/core";
 import { profile } from "@/config/menu";
 import { apps, DEFAULT_APP_SLUG, getAppBySlug } from "@/app/_mock/apps";
 import { ChatSidebar } from "./chat-sidebar";

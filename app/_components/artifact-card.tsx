@@ -11,7 +11,7 @@
  * Icon 容器走 forge-ui/react 的 CircleIcon（light variant）保持视觉与 Kit 一致。
  */
 
-import { CircleIcon } from "@forge-ui/react";
+import { CircleIcon } from "@forge-ui-official/core";
 import {
   ChartBoldDuotone,
   ChatRoundDotsBoldDuotone,

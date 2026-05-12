@@ -1,6 +1,6 @@
 "use client";
 
-import type { AppLayoutProfile } from "@forge-ui/react";
+import type { AppLayoutProfile } from "@forge-ui-official/core";
 
 export const profile: AppLayoutProfile = {
   avatar: "/chat-mascot.png",

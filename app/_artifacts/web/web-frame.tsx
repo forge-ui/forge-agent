@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@forge-ui/react";
+import { Button } from "@forge-ui-official/core";
 import type { ArtifactRenderProps } from "@/app/_artifacts/types";
 
 export default function WebFrame({ payload }: ArtifactRenderProps<"web">) {

@@ -6,7 +6,7 @@ import {
   Button,
   StatusBadge,
   TabBar,
-} from "@forge-ui/react";
+} from "@forge-ui-official/core";
 import {
   AltArrowRightLinear,
   ArchiveCheckBoldDuotone,

@@ -89,7 +89,7 @@ export const memoryCandidates: MemoryAsset[] = [
     type: "rule",
     title: "Forge UI 页面开发必须优先使用 Kit 组件",
     content:
-      "新增或修改业务页面时，优先从 @forge-ui/react 导入组件，颜色使用 fg-* token，图标使用 solar-icon-set。",
+      "新增或修改业务页面时，优先从 @forge-ui-official/core 导入组件，颜色使用 fg-* token，图标使用 solar-icon-set。",
     status: "candidate",
     confidence: 0.96,
     scope: "app",
@@ -99,7 +99,7 @@ export const memoryCandidates: MemoryAsset[] = [
       {
         id: "ev-4",
         label: "项目铁律",
-        quote: "组件只从 @forge-ui/react 导入。颜色只用 fg-* token。Icon 用 solar-icon-set。",
+        quote: "组件只从 @forge-ui-official/core 导入。颜色只用 fg-* token。Icon 用 solar-icon-set。",
         source: "AGENTS.md",
         time: "今天 14:50",
       },

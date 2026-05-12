@@ -15,7 +15,7 @@ import {
   ShieldCheckBoldDuotone,
   PlayBoldDuotone,
 } from "solar-icon-set";
-import { FileTypeIcon } from "@forge-ui/react";
+import { FileTypeIcon } from "@forge-ui-official/core";
 import { ChatPillBar, type PillAction } from "./chat-pill-bar";
 import {
   type ChatSource,

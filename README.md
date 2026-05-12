@@ -63,7 +63,7 @@
 
 ### 整套体系
 
-- 🎨 [Forge UI Kit](https://github.com/forge-ui/forge-core)（`@forge-ui/react`）—— ChatInputBar / FileTypeIcon / AppLayout / 完整 token 体系
+- 🎨 [Forge UI Kit](https://github.com/forge-ui/forge-core)（`@forge-ui-official/core`）—— ChatInputBar / FileTypeIcon / AppLayout / 完整 token 体系
 - 🌗 浅色为主，紫色 #7C3AED 单一 accent，克制、像真产品
 - ⌨️ 键盘友好：Cmd+Enter 发送、Esc 关抽屉
 - 🌐 中文界面优先，英文混排自然
@@ -77,7 +77,7 @@
 git clone https://github.com/forge-ui/forge-agent.git
 cd forge-agent
 
-# 2. 配 GitHub Packages token（@forge-ui/react 是私有包）
+# 2. 配 GitHub Packages token（@forge-ui-official/core 是私有包）
 cp .env.example .env.local
 # 在 .env.local 填 GITHUB_TOKEN=your_pat（需要 read:packages 权限）
 
@@ -89,7 +89,7 @@ pnpm dev
 # 打开 http://localhost:3000/code-studio/chat
 ```
 
-> 装不下 `@forge-ui/react`？是 GitHub Packages 鉴权问题，确认 PAT 有 `read:packages` 权限。
+> 装不下 `@forge-ui-official/core`？是 GitHub Packages 鉴权问题，确认 PAT 有 `read:packages` 权限。
 
 ---
 
@@ -114,7 +114,7 @@ pnpm dev
 - **Next.js 16**（App Router · Turbopack · static export）
 - **React 19**
 - **Tailwind CSS v4**（`@theme inline` token + `@source` 扫 forge dist）
-- **[@forge-ui/react](https://github.com/forge-ui/forge-core)** ^0.1.9（ChatInputBar / AppLayout / FileTypeIcon / DataTable / 完整 token）
+- **[@forge-ui-official/core](https://github.com/forge-ui/forge-core)** ^0.1.9（ChatInputBar / AppLayout / FileTypeIcon / DataTable / 完整 token）
 - **solar-icon-set** v2（图标）
 - **TypeScript** strict
 
